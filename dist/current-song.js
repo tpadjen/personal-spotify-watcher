@@ -71,4 +71,4 @@ exports.getSong = () => __awaiter(void 0, void 0, void 0, function* () {
         return current;
     }
 });
-//# sourceMappingURL=logger.js.map
+//# sourceMappingURL=current-song.js.map

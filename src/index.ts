@@ -2,19 +2,13 @@ import * as express from 'express'
 import * as http from 'http'
 import * as WebSocket from 'ws'
 import * as path from 'path'
-import { Song, getSong } from './logger'
-
-const app = express()
+import { Song, getSong } from './current-song'
 
 const noop = () => {}
 
-const server = http.createServer(app)
+const port = parseInt(process.env.PORT || '8999')
 
-app.set("views", path.join(__dirname, "views"))
-app.set("view engine", "ejs")
-app.use(express.static('dist'))
-
-const wss = new WebSocket.Server({ server })
+const wss = new WebSocket.Server({ port: port })
 
 interface ExtWebSocket extends WebSocket {
   isAlive: boolean
@@ -24,15 +18,11 @@ interface WebSocketMessage {
   message: string
 }
 
+let song: Song = null
+
 wss.on('connection', (ws: ExtWebSocket) => {
 
   ws.isAlive = true
-
-  ws.on('message', (body: string) => {
-    const data: WebSocketMessage = JSON.parse(body);
-    console.log(`received: ${data.message}`)
-    ws.send(`Hello, you sent -> ${data.message}`)
-  })
 
   ws.send(JSON.stringify({
     'connection': true,
@@ -44,9 +34,6 @@ wss.on('connection', (ws: ExtWebSocket) => {
   })
 
 })
-
-let song: Song = null
-let sent: boolean = false
 
 const sendSong = (s: Song) => {
   wss.clients.forEach((ws: WebSocket) => {
@@ -80,11 +67,4 @@ const pingInterval = setInterval(() => {
   })
 }, 10000);
 
-
-app.get('/', (req: express.Request, res: express.Response) => {
-  res.render('index.ejs')
-})
-
-server.listen(process.env.PORT || 8999, () => {
-  console.log(`Server started on port ${(server.address() as WebSocket.AddressInfo).port} :)`)
-})
+console.log(`WebSocket listening on ws://localhost:${port}`)

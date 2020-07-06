@@ -9,25 +9,14 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const express = require("express");
-const http = require("http");
 const WebSocket = require("ws");
-const path = require("path");
-const logger_1 = require("./logger");
-const app = express();
+const current_song_1 = require("./current-song");
 const noop = () => { };
-const server = http.createServer(app);
-app.set("views", path.join(__dirname, "views"));
-app.set("view engine", "ejs");
-app.use(express.static('dist'));
-const wss = new WebSocket.Server({ server });
+const port = parseInt(process.env.PORT || '8999');
+const wss = new WebSocket.Server({ port: port });
+let song = null;
 wss.on('connection', (ws) => {
     ws.isAlive = true;
-    ws.on('message', (body) => {
-        const data = JSON.parse(body);
-        console.log(`received: ${data.message}`);
-        ws.send(`Hello, you sent -> ${data.message}`);
-    });
     ws.send(JSON.stringify({
         'connection': true,
         song: song
@@ -36,8 +25,6 @@ wss.on('connection', (ws) => {
         ws.isAlive = true;
     });
 });
-let song = null;
-let sent = false;
 const sendSong = (s) => {
     wss.clients.forEach((ws) => {
         ws.send(JSON.stringify({
@@ -55,7 +42,7 @@ const songChanged = (newSong, oldSong) => {
     return newSong && song && (newSong.artist !== song.artist || newSong.name !== song.name);
 };
 setInterval(() => __awaiter(void 0, void 0, void 0, function* () {
-    const newSong = yield logger_1.getSong();
+    const newSong = yield current_song_1.getSong();
     if (songChanged(newSong, song)) {
         song = newSong;
         sendSong(song);
@@ -69,10 +56,5 @@ const pingInterval = setInterval(() => {
         ws.ping(noop);
     });
 }, 10000);
-app.get('/', (req, res) => {
-    res.render('index.ejs');
-});
-server.listen(process.env.PORT || 8999, () => {
-    console.log(`Server started on port ${server.address().port} :)`);
-});
+console.log(`WebSocket listening on ws://localhost:${port}`);
 //# sourceMappingURL=index.js.map
