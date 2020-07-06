@@ -34,6 +34,7 @@ const removeRemaster = (title: string): string => {
 
 const parseSong = (info: any): Song => {
   return {
+    ...info,
     artist: info.item.artists.map((artist: any) => artist.name).join(' '),
     name: removeRemaster(info.item.name)
   }

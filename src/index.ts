@@ -45,9 +45,7 @@ const sendSong = (s: Song) => {
 
 const songChanged = (newSong: Song, oldSong: Song): boolean => {
   if (!newSong && !song) return false;
-  if (newSong && !song) return true;
-  if (!newSong && song) return true;
-  return newSong && song && (newSong.artist !== song.artist || newSong.name !== song.name);
+  return JSON.stringify(newSong) !== JSON.stringify(song)
 }
 
 setInterval(async() => {
