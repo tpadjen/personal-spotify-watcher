@@ -10,7 +10,8 @@ const PORT = parseInt(process.env.PORT || process.env.DEV ? '8999' : '8080')
 const INDEX = '/index.html'
 
 const server = express()
-  .use(express.static(__dirname))
+  // .use(express.static(__dirname))
+  .use((req, res) => res.sendFile(INDEX, { root: __dirname }))
   .listen(PORT, () => console.log(`Listening on ${PORT}`))
 
 const wss = new WebSocket.Server({ server })
