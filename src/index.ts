@@ -69,7 +69,7 @@ setInterval(async() => {
       sendSong(song)
     }
   } catch (error) {
-    console.error(error)
+    console.log(error)
     sendError(error)
   }
 }, 2000)
