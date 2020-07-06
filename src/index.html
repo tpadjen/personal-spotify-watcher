@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Current Song</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div id="song-box">
+    <a id="song" class="song" target="_blank">
+      <div id="album">
+        <h2 id="album-name"></h2>
+        <img src="" alt="">
+      </div>
+      <div class="info">
+        <h1 id="title"></h1>
+        <h2 id="artist"></h2>
+      </div>
+    </a>
+    <div id="no-song" class="song">
+      <h1 id="not-playing">No Song Playing</h1>
+    </div>
+  </div>
+  <pre id="json" class="hidden"></pre>
+  <script src="./app.js"></script>
+</body>
+</html>

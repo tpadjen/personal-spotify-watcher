@@ -6,9 +6,14 @@ import { Song, getSong } from './current-song'
 
 const noop = () => {}
 
-const port = parseInt(process.env.PORT || '8999')
+const PORT = parseInt(process.env.PORT || '8999')
+const INDEX = '/index.html'
 
-const wss = new WebSocket.Server({ port: port })
+const server = express()
+  .use(express.static(__dirname))
+  .listen(PORT, () => console.log(`Listening on ${PORT}`))
+
+const wss = new WebSocket.Server({ server })
 
 interface ExtWebSocket extends WebSocket {
   isAlive: boolean
@@ -77,5 +82,3 @@ const pingInterval = setInterval(() => {
     ws.ping(noop)
   })
 }, 10000);
-
-console.log(`WebSocket listening on ws://localhost:${port}`)

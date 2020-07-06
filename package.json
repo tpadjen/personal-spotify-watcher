@@ -7,16 +7,19 @@
     "clean": "rimraf dist/*",
     "tsc": "tsc",
     "build": "tsc",
-    "dev:start": "npm-run-all build start",
-    "dev": "nodemon --watch src -e ts,ejs -x ts-node src/index.ts",
-    "start": "ts-node src/index.ts",
+    "dev": "tsc-watch --onSuccess \"node src/index.js\"",
+    "prestart": "npm run build",
+    "start": "node src/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Tim Padjen",
   "license": "ISC",
   "dependencies": {
+    "bufferutil": "^4.0.1",
     "dotenv": "^8.2.0",
+    "express": "^4.17.1",
     "spotify-web-api-node": "^4.0.0",
+    "utf-8-validate": "^5.0.2",
     "ws": "^7.3.1"
   },
   "engines": {
@@ -25,10 +28,12 @@
   "devDependencies": {
     "@types/express": "^4.17.6",
     "@types/ws": "^7.2.6",
+    "concurrently": "^5.2.0",
     "nodemon": "^2.0.4",
     "npm-run-all": "^4.1.5",
     "rimraf": "^3.0.2",
     "ts-node": "^8.10.2",
+    "tsc-watch": "^4.2.9",
     "typescript": "^3.9.6"
   }
 }
