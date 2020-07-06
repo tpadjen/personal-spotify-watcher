@@ -43,16 +43,29 @@ const sendSong = (s: Song) => {
   })
 }
 
+const sendError = (error: any) => {
+  wss.clients.forEach((ws: WebSocket) => {
+    ws.send(JSON.stringify({
+      error: error
+    }))
+  })
+}
+
 const songChanged = (newSong: Song, oldSong: Song): boolean => {
   if (!newSong && !song) return false;
   return JSON.stringify(newSong) !== JSON.stringify(song)
 }
 
 setInterval(async() => {
-  const newSong: Song = await getSong()
-  if (songChanged(newSong, song)) {
-    song = newSong
-    sendSong(song)
+  try {
+    const newSong: Song = await getSong()
+    if (songChanged(newSong, song)) {
+      song = newSong
+      sendSong(song)
+    }
+  } catch (error) {
+    console.error(error)
+    sendError(error)
   }
 }, 2000)
 

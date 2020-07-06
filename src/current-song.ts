@@ -56,10 +56,10 @@ const getCurrentSong = async (): Promise<Song> => {
     if (error.statusCode === 401) {
       // console.log('Reauthorizing')
       spotifyApi.setAccessToken(null)
-    } else {
-      console.error(error)
+      return current
     }
-    return current;
+
+    throw error;
   }
 }
 
