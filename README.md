@@ -6,5 +6,3 @@ npm run dev
 ```
 
 Open `http://localhost:8999`
-
-change for heroku
