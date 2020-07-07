@@ -6,7 +6,7 @@ import { Song, getSong } from './current-song'
 
 const noop = () => {}
 
-const PORT = parseInt(process.env.PORT || process.env.DEV ? '8999' : '8080')
+const PORT = parseInt(process.env.PORT || (!!process.env.DEV ? '8999' : '8080'))
 const INDEX = '/index.html'
 
 const server = express()
