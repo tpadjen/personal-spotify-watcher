@@ -32,12 +32,27 @@ const removeRemaster = (title: string): string => {
   return title.replace(/-\s+.*Remaster.*$/, "").trim()
 }
 
+const cleanAlbum = (album: string): string => {
+  let cleaner = album.trim();
+
+  const remove_terms = ['Deluxe', 'Remaster', 'Re-Master', 'Edition']
+  remove_terms.forEach(term => {
+    const regex = new RegExp(`\\(.*${term}.*\\)$`)
+    cleaner = cleaner.replace(regex, '')
+  })
+
+  return cleaner.trim()
+}
+
 const parseSong = (info: any): Song => {
-  return {
+  let song = {
     ...info,
     artist: info.item.artists.map((artist: any) => artist.name).join(' '),
     name: removeRemaster(info.item.name)
   }
+
+  song.item.album.name = cleanAlbum(song.item.album.name)
+  return song
 }
 
 let current: Song = null;
