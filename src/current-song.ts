@@ -88,3 +88,10 @@ export const getSong = async (): Promise<Song> => {
     return current
   }
 }
+
+export const getRecentlyPlayed = async (): Promise<any> => {
+  await refreshAuthToken()
+
+  const recent = await spotifyApi.getMyRecentlyPlayedTracks({limit: 50})
+  return recent
+}

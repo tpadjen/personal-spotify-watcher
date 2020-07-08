@@ -2,7 +2,7 @@ import * as express from 'express'
 import * as http from 'http'
 import * as WebSocket from 'ws'
 import * as path from 'path'
-import { Song, getSong } from './current-song'
+import { Song, getSong, getRecentlyPlayed } from './current-song'
 
 const noop = () => {}
 
@@ -44,7 +44,17 @@ wss.on('connection', (ws: ExtWebSocket) => {
 const sendSong = (s: Song) => {
   wss.clients.forEach((ws: WebSocket) => {
     ws.send(JSON.stringify({
+      type: 'track',
       song: s
+    }))
+  })
+}
+
+const sendRecent = (recent: any) => {
+  wss.clients.forEach((ws: WebSocket) => {
+    ws.send(JSON.stringify({
+      type: 'recently_played',
+      recent
     }))
   })
 }
@@ -68,6 +78,8 @@ setInterval(async() => {
     if (songChanged(newSong, song)) {
       song = newSong
       sendSong(song)
+      const recentlyPlayed = await getRecentlyPlayed()
+      sendRecent(recentlyPlayed)
     }
   } catch (error) {
     console.log(error)
