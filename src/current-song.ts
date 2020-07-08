@@ -28,8 +28,8 @@ const refreshAuthToken = async() => {
   })
 }
 
-const removeRemaster = (title: string): string => {
-  return title.replace(/-\s+.*Remaster.*$/, "").trim()
+const removeExtraSongInfo = (title: string): string => {
+  return title.replace(/-\s+.*$/, "").trim()
 }
 
 const cleanAlbum = (album: string): string => {
@@ -48,7 +48,7 @@ const parseSong = (info: any): Song => {
   let song = {
     ...info,
     artist: info.item.artists.map((artist: any) => artist.name).join(' '),
-    name: removeRemaster(info.item.name)
+    name: removeExtraSongInfo(info.item.name)
   }
 
   song.item.album.name = cleanAlbum(song.item.album.name)
