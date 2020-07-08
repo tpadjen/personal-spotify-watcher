@@ -13,7 +13,8 @@ export interface Song {
   name: string,
   item: {
     id: string
-  }
+  },
+  "progress_ms": number
 }
 
 const refreshAuthToken = async() => {

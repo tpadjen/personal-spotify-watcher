@@ -9,7 +9,12 @@ const noop = () => {}
 const PORT = parseInt(process.env.PORT || (!!process.env.DEV ? '8999' : '8080'))
 const INDEX = '/index.html'
 
+let recently_played: Array<Song> = []
+
 const server = express()
+  .use('/secure', (req, res) => {
+    res.send(403)
+  })
   .use(express.static(__dirname))
   // .use((req, res) => res.sendFile(INDEX, { root: __dirname }))
   .listen(PORT, () => console.log(`Listening on ${PORT}`))
@@ -36,11 +41,14 @@ wss.on('connection', (ws: ExtWebSocket) => {
     song: song
   }))
 
-  getRecentlyPlayed().then((recent => {
-    ws.send(JSON.stringify({
-      type: 'recently_played',
-      recent
-    }))
+  // remove currently playing song from recents sent to client
+  let recent = JSON.parse(JSON.stringify(recently_played))
+  if (recent.length > 0 && recent[0].item.id === song.item.id)
+  recent.shift()
+
+  ws.send(JSON.stringify({
+    type: 'recently_played',
+    recent
   }))
 
   ws.on('pong', () => {
@@ -85,14 +93,25 @@ const differentSong = (newSong: Song, oldSong: Song): boolean => {
   return newSong?.item?.id !== oldSong?.item?.id
 }
 
+const updateRecentlyPlayed = (newSong: Song) => {
+  if (newSong && newSong.progress_ms >= 15 * 1000) { // listened for 15 seconds
+    if (!recently_played[0] || (recently_played[0] && recently_played[0].item.id !== newSong.item.id)) {
+      console.log(`Adding ${newSong.name} to recently played`)
+      recently_played.unshift(newSong)
+    }
+  }
+}
+
 setInterval(async() => {
   try {
     const newSong: Song = await getSong()
+    updateRecentlyPlayed(newSong);
+
     if (songChanged(newSong, song)) {
       sendSong(newSong)
 
       if (differentSong(newSong, song)) {
-        sendRecent(await getRecentlyPlayed())
+        sendRecent(recently_played)
       }
 
       song = newSong
