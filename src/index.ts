@@ -32,7 +32,15 @@ wss.on('connection', (ws: ExtWebSocket) => {
 
   ws.send(JSON.stringify({
     'connection': true,
+    type: 'track',
     song: song
+  }))
+
+  getRecentlyPlayed().then((recent => {
+    ws.send(JSON.stringify({
+      type: 'recently_played',
+      recent
+    }))
   }))
 
   ws.on('pong', () => {
@@ -72,14 +80,22 @@ const songChanged = (newSong: Song, oldSong: Song): boolean => {
   return JSON.stringify(newSong) !== JSON.stringify(song)
 }
 
+const differentSong = (newSong: Song, oldSong: Song): boolean => {
+  if (!oldSong || !newSong) return false // no need for recently played update
+  return newSong?.item?.id !== oldSong?.item?.id
+}
+
 setInterval(async() => {
   try {
     const newSong: Song = await getSong()
     if (songChanged(newSong, song)) {
+      sendSong(newSong)
+
+      if (differentSong(newSong, song)) {
+        sendRecent(await getRecentlyPlayed())
+      }
+
       song = newSong
-      sendSong(song)
-      const recentlyPlayed = await getRecentlyPlayed()
-      sendRecent(recentlyPlayed)
     }
   } catch (error) {
     console.log(error)

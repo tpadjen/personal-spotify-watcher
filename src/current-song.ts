@@ -10,7 +10,10 @@ var spotifyApi = new SpotifyWebApi({
 
 export interface Song {
   artist: string,
-  name: string
+  name: string,
+  item: {
+    id: string
+  }
 }
 
 const refreshAuthToken = async() => {
@@ -92,6 +95,6 @@ export const getSong = async (): Promise<Song> => {
 export const getRecentlyPlayed = async (): Promise<any> => {
   await refreshAuthToken()
 
-  const recent = await spotifyApi.getMyRecentlyPlayedTracks({limit: 50})
+  const recent = await spotifyApi.getMyRecentlyPlayedTracks()
   return recent
 }
