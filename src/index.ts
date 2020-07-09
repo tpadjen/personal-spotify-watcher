@@ -10,6 +10,7 @@ const noop = () => {}
 const PORT = parseInt(process.env.PORT || (!!process.env.DEV ? '8999' : '8080'))
 const INDEX = '/index.html'
 const RECENTS_FILE = path.join(__dirname, 'secure/recents.json')
+const RECENTS_LIMIT = 100
 
 const loadRecents = (): Array<Song> => {
   let recents: Array<Song> = []
@@ -113,6 +114,12 @@ const updateRecentlyPlayed = (newSong: Song) => {
     if (!recently_played[0] || (recently_played[0] && recently_played[0].item.id !== newSong.item.id)) {
       // console.log(`Adding ${newSong.name} to recently played`)
       recently_played.unshift(newSong)
+
+      // limit size of recently played list
+      while (recently_played.length > RECENTS_LIMIT) {
+        recently_played.pop()
+      }
+
       fs.writeFile(RECENTS_FILE, JSON.stringify(recently_played), "utf8", () => {
         // console.log("Recents saved");
       })
