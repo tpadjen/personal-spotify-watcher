@@ -51,14 +51,9 @@ wss.on('connection', async (ws: ExtWebSocket) => {
 
   ws.isAlive = true
 
-  ws.send(JSON.stringify({
-    'connection': true,
-    type: 'track',
-    song: song
-  }))
-
   // update recents, but wait for first song
   if (!song) song = await getSong()
+  sendSong(song)
   sendRecent(recently_played, song)
 
   ws.on('pong', () => {
