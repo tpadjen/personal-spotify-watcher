@@ -3,13 +3,28 @@ import * as http from 'http'
 import * as WebSocket from 'ws'
 import * as path from 'path'
 import { Song, getSong, getRecentlyPlayed } from './current-song'
+import * as fs from 'fs'
 
 const noop = () => {}
 
 const PORT = parseInt(process.env.PORT || (!!process.env.DEV ? '8999' : '8080'))
 const INDEX = '/index.html'
+const RECENTS_FILE = path.join(__dirname, 'secure/recents.json')
 
-let recently_played: Array<Song> = []
+const loadRecents = (): Array<Song> => {
+  let recents: Array<Song> = []
+  if (!fs.existsSync(RECENTS_FILE)) {
+    fs.closeSync(fs.openSync(RECENTS_FILE, 'w'))
+  } else {
+    try {
+      recents = JSON.parse(fs.readFileSync(RECENTS_FILE, "utf-8"))
+    } catch (e) {}
+  }
+
+  return recents
+}
+
+let recently_played: Array<Song> = loadRecents()
 
 const server = express()
   .use('/secure', (req, res) => {
@@ -31,7 +46,7 @@ interface WebSocketMessage {
 
 let song: Song = null
 
-wss.on('connection', (ws: ExtWebSocket) => {
+wss.on('connection', async (ws: ExtWebSocket) => {
 
   ws.isAlive = true
 
@@ -41,15 +56,9 @@ wss.on('connection', (ws: ExtWebSocket) => {
     song: song
   }))
 
-  // remove currently playing song from recents sent to client
-  let recent = JSON.parse(JSON.stringify(recently_played))
-  if (recent.length > 0 && recent[0].item.id === song.item.id)
-  recent.shift()
-
-  ws.send(JSON.stringify({
-    type: 'recently_played',
-    recent
-  }))
+  // update recents, but wait for first song
+  if (!song) song = await getSong()
+  sendRecent(recently_played, song)
 
   ws.on('pong', () => {
     ws.isAlive = true
@@ -66,11 +75,17 @@ const sendSong = (s: Song) => {
   })
 }
 
-const sendRecent = (recent: any) => {
+const sendRecent = (recent: any, newSong: Song) => {
+  // remove currently playing song from recents sent to client
+  let r = JSON.parse(JSON.stringify(recent)) // make duplicate
+  if (r.length > 0 && newSong && r[0].item.id === newSong.item.id) {
+    r.shift()
+  }
+
   wss.clients.forEach((ws: WebSocket) => {
     ws.send(JSON.stringify({
       type: 'recently_played',
-      recent
+      recent: r
     }))
   })
 }
@@ -84,20 +99,23 @@ const sendError = (error: any) => {
 }
 
 const songChanged = (newSong: Song, oldSong: Song): boolean => {
-  if (!newSong && !song) return false;
+  if (!newSong && !song) return false
   return JSON.stringify(newSong) !== JSON.stringify(song)
 }
 
 const differentSong = (newSong: Song, oldSong: Song): boolean => {
-  if (!oldSong || !newSong) return false // no need for recently played update
+  if (!oldSong || !newSong) return false
   return newSong?.item?.id !== oldSong?.item?.id
 }
 
 const updateRecentlyPlayed = (newSong: Song) => {
   if (newSong && newSong.progress_ms >= 15 * 1000) { // listened for 15 seconds
     if (!recently_played[0] || (recently_played[0] && recently_played[0].item.id !== newSong.item.id)) {
-      console.log(`Adding ${newSong.name} to recently played`)
+      // console.log(`Adding ${newSong.name} to recently played`)
       recently_played.unshift(newSong)
+      fs.writeFile(RECENTS_FILE, JSON.stringify(recently_played), "utf8", () => {
+        // console.log("Recents saved");
+      })
     }
   }
 }
@@ -111,7 +129,7 @@ setInterval(async() => {
       sendSong(newSong)
 
       if (differentSong(newSong, song)) {
-        sendRecent(recently_played)
+        sendRecent(recently_played, newSong)
       }
 
       song = newSong
