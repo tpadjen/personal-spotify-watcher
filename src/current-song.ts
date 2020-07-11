@@ -33,6 +33,10 @@ const refreshAuthToken = async() => {
 }
 
 const removeExtraSongInfo = (title: string): string => {
+  // Fix Philharmonic nonsense
+  if (title.match((/(-\s+From.*$)$/))) return title.trim()
+  if (title.match((/(-\s+Theme.*$)$/))) return title.trim()
+
   return title.replace(/-\s+.*$/, "").trim()
 }
 
@@ -48,10 +52,20 @@ const cleanAlbum = (album: string): string => {
   return cleaner.trim()
 }
 
+const findArtist = (artists: Array<any>): string => {
+  // find the actual composer for the Philharmonic album
+  const spot = artists.findIndex(artist => artist.name.match(/Royal Philharmonic/))
+  if (spot > 0) {
+    return artists[spot-1].name.trim()
+  }
+
+  return artists.map((artist: any) => artist.name).join(' ')
+}
+
 const parseSong = (info: any): Song => {
   let song = {
     ...info,
-    artist: info.item.artists.map((artist: any) => artist.name).join(' '),
+    artist: findArtist(info.item.artists),
     name: removeExtraSongInfo(info.item.name)
   }
 
