@@ -1,0 +1,10 @@
+{
+  "extends": "../tsconfig.base",
+  "compileOnSave": false,
+  "compilerOptions": {
+    "allowSyntheticDefaultImports": true,
+    "jsx": "react",
+    "esModuleInterop": true,
+    "baseUrl": ".",
+  },
+}

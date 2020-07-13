@@ -1,12 +1,13 @@
-.env
 node_modules/
 dist/
-npm-debug.log
-/*.env.development
-/*.env.production
-src/**/*.js
-src/**/*.js.map
-src/secure/recents.json
 data/
 
+/*.env
+/*.env.development
+/*.env.production
+
+server/**/*.js
+server/**/*.js.map
+
 .DS_Store
+npm-debug.log

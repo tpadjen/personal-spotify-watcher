@@ -1,0 +1,263 @@
+$page-bg: #6a6a6a;
+$bg-color: #333;
+$main-text: #cdcdcd;
+$highlight-text: #189cc4;
+$alternate: #ffbcbc;
+
+$ft-serif: 'Enriqueta', Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+$ft-sans: 'Josefin Sans', 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+
+* {
+  box-sizing: border-box;
+}
+
+*, *:before, *:after {
+  box-sizing: border-box;
+}
+
+body {
+  background: $page-bg;
+  text-align: center;
+  margin: 30px 0;
+}
+
+.hello {
+  color: rgb(142, 30, 30);
+}
+
+.hidden {
+  display: none !important;
+}
+
+#song-panel, #no-song {
+  display: grid;
+  justify-items: center;
+  align-items: center;
+}
+
+.song {
+  background: $bg-color;
+  border-radius: 4px;
+  display: grid;
+  width: 70vw;
+  padding: 24px 30px 60px 60px;
+  grid-template-columns: 49% 1% 50%;
+  grid-template-rows: 1fr;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  border: solid 10px $bg-color;
+  transition: all 0.05s ease;
+  text-decoration: none;
+}
+
+#no-song {
+  grid-template-columns: 1fr;
+  padding: 24px 40px 40px 24px;
+  cursor: default;
+}
+
+#song:hover {
+  border-color: $alternate;
+  transform: skew(-0.5deg, 0.5deg);
+}
+
+.info {
+  grid-column: 3;
+}
+
+
+#title, #not-playing {
+  font-family: $ft-serif;
+  color: $main-text;
+  font-size: 40px;
+  text-align: left;
+  min-width: 200px;
+}
+
+#not-playing {
+  text-align: center;
+}
+
+#artist {
+  font-family: $ft-sans;
+  color: $highlight-text;
+  font-size: 40px;
+  text-align: left;
+}
+
+#album {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  align-items: center;
+  font-family: $ft-sans;
+}
+
+#album img {
+  justify-self: center;
+  width: 300px;
+  box-shadow: 10px 10px 5px 0px rgba(0,0,0,0.55);
+  border-radius: 2px;
+}
+
+#album-name {
+  color: $highlight-text;
+  font-size: 28px;
+  justify-content: end;
+  align-items: start;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+#recent-panel {
+  display: grid;
+  box-sizing: border-box;
+  justify-items: center;
+}
+
+#recent-heading {
+  box-sizing: border-box;
+  margin-top: 80px;
+  margin-bottom: 0;
+  width: 70vw;
+  padding: 20px 0 14px 20px;
+  background-color: $highlight-text;
+  color: $bg-color;
+  text-align: left;
+  font-family: $ft-sans;
+  font-size: 30px;
+  border-top-left-radius: 3px;
+  border-top-right-radius: 3px;
+}
+
+#recent {
+  box-sizing: border-box;
+  width: 70vw;
+  margin-top: 0;
+  font-size: 22px;
+  background-color: $bg-color;
+  padding: 20px 50px 20px 50px;
+  border-bottom-left-radius: 3px;
+  border-bottom-right-radius: 3px;
+
+  .recent-song {
+    box-sizing: content-box;
+    text-decoration: none;
+    color: $main-text;
+    display: grid;
+    grid-template-columns: 1fr 1.5fr 3fr;
+    height: 80px;
+    align-items: center;
+    padding: 0;
+    margin: 4px 0 4px 0;
+    border: 4px solid $bg-color;
+    border-radius: 6px;
+    transition: all 0.05s ease;
+  }
+
+  .recent-song:nth-child(even) {
+    background-color: #282828;
+  }
+
+  .album-thumb {
+    height: 80px;
+  }
+
+  .artist, .title {
+    text-align: left;
+    overflow-x: hidden;
+  }
+
+  .artist, .title {
+    padding-left: 20px;
+  }
+
+  .artist {
+    color: $highlight-text;
+    font-family: $ft-sans;
+  }
+
+  .title {
+    font-family: $ft-serif;
+  }
+
+  .recent-song:hover {
+    background: $page-bg;
+    border-color: $alternate;
+    transform: scale(1.05);
+
+    .title {
+      color: $bg-color;
+    }
+
+    .artist {
+      color: $alternate;
+    }
+
+  }
+
+}
+
+#no-song {
+  min-height: 400px;
+}
+
+
+@media screen and (max-width: 1200px) {
+
+  #song {
+    width: 80vw;
+  }
+
+}
+
+@media screen and (max-width: 900px) {
+
+  #album img {
+    width: 30vw;
+    box-shadow: 5px 5px 5px 0px rgba(0,0,0,0.55);
+    border-radius: 2px;
+  }
+
+  #song {
+    width: 100vw;
+    width: 100vw;
+    max-width: 100vw;
+  }
+
+  .song {
+    width: 100vw;
+    border: solid 10px $bg-color;
+    padding: 15px 70px 50px 40px;
+  }
+
+  #title, #artist {
+    font-size: 30px;
+  }
+
+  #song:hover {
+    transform: none;
+  }
+}
+
+@media screen and (max-width: 600px) {
+
+  #recent {
+    font-size: 18px;
+  }
+
+  #song {
+    grid-template-columns: 1fr 2px auto;
+    padding-left: 0;
+    padding-right: 0;
+    min-width: 0;
+    position: relative;
+    left: -1px;
+  }
+
+  #title, #artist, #album-name {
+    font-size: 22px;
+  }
+
+}
