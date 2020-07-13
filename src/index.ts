@@ -1,15 +1,21 @@
-import * as express from 'express'
-import * as http from 'http'
-import * as WebSocket from 'ws'
 import * as path from 'path'
-import { Song, getSong, getRecentlyPlayed } from './current-song'
+import * as dotenv from 'dotenv'
+const envPath = path.join(__dirname, `../.env.${process.env.NODE_ENV || 'production'}`)
+dotenv.config({ path: envPath })
+const PRODUCTION = process.env.NODE_ENV === 'production'
+
+import * as express from 'express'
+import * as WebSocket from 'ws'
+import { Song, getSong } from './current-song'
 import * as fs from 'fs'
+
 
 const noop = () => {}
 
-const PORT = parseInt(process.env.PORT || (!!process.env.DEV ? '8999' : '8080'))
-const INDEX = '/index.html'
-const RECENTS_FILE = path.join(__dirname, 'secure/recents.json')
+
+const PORT = parseInt(process.env.PORT || (PRODUCTION ? '8080' : '8999'))
+const SOURCE_DIR = path.join(__dirname, PRODUCTION ? 'client' : '../../dist/client')
+const RECENTS_FILE = path.join(__dirname, '../data/recents.json')
 const RECENTS_LIMIT = 100
 
 const loadRecents = (): Array<Song> => {
@@ -28,11 +34,7 @@ const loadRecents = (): Array<Song> => {
 let recently_played: Array<Song> = loadRecents()
 
 const server = express()
-  .use('/secure', (req, res) => {
-    res.send(403)
-  })
-  .use(express.static(__dirname))
-  // .use((req, res) => res.sendFile(INDEX, { root: __dirname }))
+  .use(express.static(SOURCE_DIR))
   .listen(PORT, () => console.log(`Listening on ${PORT}`))
 
 const wss = new WebSocket.Server({ server })

@@ -2,9 +2,11 @@
 node_modules/
 dist/
 npm-debug.log
-/*.env
+/*.env.development
+/*.env.production
 src/**/*.js
 src/**/*.js.map
 src/secure/recents.json
+data/
 
 .DS_Store

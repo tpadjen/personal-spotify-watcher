@@ -4,12 +4,18 @@
   "description": "",
   "main": "dist/index.js",
   "scripts": {
+    "initialize": "mkdir data",
     "clean": "del-cli \"dist/*.*\"",
     "tsc": "./node_modules/typescript/bin/tsc",
     "build": "npm run tsc",
+    "prebuild:prod": "del-cli dist",
+    "build:prod": "./node_modules/typescript/bin/tsc --outDir dist --sourceMap false",
+    "postbuild:prod": "npm run importclient",
+    "importclient": "del-cli dist/client && cp -r ../current-client/dist dist/client",
     "dev": "tsc-watch --onSuccess \"node src/index.js\"",
     "prestart": "npm run build",
     "start": "node src/index.js",
+    "start:prod": "NODE_ENV=production node dist/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Tim Padjen",
@@ -33,6 +39,7 @@
   },
   "devDependencies": {
     "concurrently": "^5.2.0",
+    "cpy-cli": "^3.1.1",
     "nodemon": "^2.0.4",
     "npm-run-all": "^4.1.5",
     "ts-node": "^8.10.2",
