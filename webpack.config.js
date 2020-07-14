@@ -7,7 +7,7 @@ const createStyledComponentsTransformer  = require('typescript-plugin-styled-com
 const styledComponentsTransformer = createStyledComponentsTransformer();
 
 module.exports = {
-  entry: './client/app/app.tsx',
+  entry: './client/App.tsx',
   output: {
     path: path.resolve(__dirname, 'dist/client'),
     filename: 'app.[contenthash].js',
@@ -52,11 +52,11 @@ module.exports = {
       'process.env.PORT': process.env.NODE_ENV === 'production' ? '8080' : '8999'
     }),
     new HtmlWebpackPlugin({
-      template: 'client/app/index.html'
+      template: 'client/index.html'
     }),
     new CopyWebpackPlugin({
       patterns: [
-        { from: 'client/app/assets/images', to: 'public/images' },
+        { from: 'client/assets/images', to: 'public/images' },
       ]
     })
   ],

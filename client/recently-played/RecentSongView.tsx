@@ -1,5 +1,5 @@
 import React from 'react'
-import { Song } from '../store/music-models'
+import { Song } from '../store/Music.model'
 
 
 interface RecentSongViewProps {

@@ -1,13 +1,13 @@
-import { ConnectionStatus } from './connection-report'
-import { SpotifyStore } from '../store/spotify-store'
-const { connection$, song$, recent$ } = SpotifyStore
+import { ConnectionStatus, SentData, SentSong, SentRecents } from './Connection.model'
+import { SpotifyStore } from '../store/SpotifyStore'
+const { connection$, song$, recents$ } = SpotifyStore
 
 
 class SpotifyConnection {
 
   connect() {
     let socket = new WebSocket(`ws://${window.location.hostname}:${process.env.PORT}`)
-    // let socket = new WebSocket('ws://tbq-current-spotify-song.herokuapp.com/')
+
     socket.addEventListener('open', () => {
       console.log('Connected to socket')
       connection$.next({
@@ -18,21 +18,19 @@ class SpotifyConnection {
 
     socket.addEventListener('close', () => {
       console.log('Connection to socket closed, Trying to reconnect...')
+      connection$.next({
+        status: ConnectionStatus.closed,
+        message: 'Trying to reconnect...'
+      })
       const that = this;
-      setTimeout(() => {
-        connection$.next({
-          status: ConnectionStatus.error,
-          message: 'Connection closed, Trying to reconnect...'
-        })
-        that.connect()
-      }, 1000);
+      setTimeout(() => that.connect(), 1000);
     })
 
     socket.addEventListener('error', (err) => {
-      console.error(`Socket error:`, err)
+      // console.error(`Socket error:`, err)
       connection$.next({
         status: ConnectionStatus.error,
-        message: 'Connection problem'
+        message: 'Error'
       })
       socket.close()
     })
@@ -61,18 +59,21 @@ class SpotifyConnection {
         message: 'Data received'
       })
 
-      switch (data['type']) {
-        case 'track':
-          song$.next(data['song'])
-          break;
-        case 'recently_played':
-          recent$.next(data['recent'])
-        default:
-          break;
-      }
-
+      this.handleMessage(data)
     })
 
+  }
+
+  handleMessage(data: SentData) {
+    switch (data['type']) {
+      case 'track':
+        song$.next((data as SentSong).song)
+        break;
+      case 'recently_played':
+        recents$.next((data as SentRecents).recents)
+      default:
+        break;
+    }
   }
 
 }

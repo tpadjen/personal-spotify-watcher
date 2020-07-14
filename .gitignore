@@ -1,13 +1,18 @@
 node_modules/
+
+# production build and server data folders
 dist/
 data/
 
+# environment variables
 /*.env
 /*.env.development
 /*.env.production
 
+# compiled files
 server/**/*.js
 server/**/*.js.map
 
+# misc
 .DS_Store
 npm-debug.log

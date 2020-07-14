@@ -1,4 +1,5 @@
-const SpotifyWebApi = require('spotify-web-api-node');
+import * as fs from 'fs'
+const SpotifyWebApi = require('spotify-web-api-node')
 
 var spotifyApi = new SpotifyWebApi({
   clientId: process.env.CLIENT_ID,
@@ -111,4 +112,23 @@ export const getRecentlyPlayed = async (): Promise<any> => {
 
   const recent = await spotifyApi.getMyRecentlyPlayedTracks()
   return recent
+}
+
+export const loadRecents = (recents_file: string): Array<Song> => {
+  let recents: Array<Song> = []
+  if (!fs.existsSync(recents_file)) {
+    fs.closeSync(fs.openSync(recents_file, 'w'))
+  } else {
+    try {
+      recents = JSON.parse(fs.readFileSync(recents_file, "utf-8"))
+    } catch (e) { }
+  }
+
+  return recents
+}
+
+export const saveRecents = (recents_file: string, recently_played: Array<Song>): void => {
+  fs.writeFile(recents_file, JSON.stringify(recently_played), "utf8", () => {
+    // console.log("Recents saved");
+  })
 }

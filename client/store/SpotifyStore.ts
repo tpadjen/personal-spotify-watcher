@@ -1,13 +1,13 @@
-import { Subject, BehaviorSubject, Observable, of } from "rxjs"
-import { Song } from "./music-models"
-import { ConnectionReport, ConnectionStatus } from "../connection/connection-report"
+import { BehaviorSubject, Observable, of } from "rxjs"
+import { Song } from "./Music.model"
+import { ConnectionReport, ConnectionStatus } from "../connection/Connection.model"
 import { map, takeWhile, take, switchMap, tap } from "rxjs/operators"
 
 
 class SpotifyStore {
 
   song$: BehaviorSubject<Song | undefined> = new BehaviorSubject<Song | undefined>(undefined)
-  recent$: BehaviorSubject<Array<any>> = new BehaviorSubject<Array<any>>([])
+  recents$: BehaviorSubject<Song[]> = new BehaviorSubject<Song[]>([])
 
   connection$: BehaviorSubject<ConnectionReport> = new BehaviorSubject<ConnectionReport>({
     status: ConnectionStatus.connecting,
@@ -19,6 +19,16 @@ class SpotifyStore {
     map((status: ConnectionStatus) => status !== ConnectionStatus.okay),
     map(pred => !!pred),
     takeWhile((loading: boolean) => loading, true)
+  )
+
+  okay$: Observable<boolean> = this.connection$.pipe(
+    map((report: ConnectionReport) => {
+      return [
+        ConnectionStatus.connecting,
+        ConnectionStatus.connected,
+        ConnectionStatus.okay
+      ].includes(report.status)
+    })
   )
 
   fetched$: Observable<boolean> = this.song$.pipe(
@@ -55,3 +65,9 @@ class SpotifyStore {
 
 const spotifyStore = new SpotifyStore()
 export {spotifyStore as SpotifyStore}
+export const connection$ = spotifyStore.connection$
+export const loading$    = spotifyStore.loading$
+export const okay$       = spotifyStore.okay$
+export const song$       = spotifyStore.song$
+export const recents$     = spotifyStore.recents$
+export const fetched$    = spotifyStore.fetched$

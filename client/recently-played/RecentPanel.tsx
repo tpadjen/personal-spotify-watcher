@@ -1,21 +1,21 @@
 import React from 'react'
-import { SpotifyStore } from '../store/spotify-store';
-import { RecentSongView } from './recent-song-view'
-import { Song } from '../store/music-models';
+import { recents$ } from '../store/SpotifyStore';
+import { RecentSongView } from './RecentSongView'
+import { Song } from '../store/Music.model';
 import { Subscription } from 'rxjs';
 import ScaleLoader from 'react-spinners/ScaleLoader'
 
 
 interface RecentPanelState {
-  recent: Array<any> | undefined
+  recents: Array<Song>
 }
 
 export class RecentPanel extends React.Component<any, RecentPanelState> {
-  state: RecentPanelState = { recent: undefined }
+  state: RecentPanelState = { recents: recents$.value }
   sub: Subscription | undefined
 
   componentDidMount() {
-    this.sub = SpotifyStore.recent$.subscribe((recent: any) => this.setState({recent}))
+    this.sub = recents$.subscribe((recents: Song[]) => this.setState({recents}))
   }
 
   componentWillUnmount() {
@@ -24,14 +24,12 @@ export class RecentPanel extends React.Component<any, RecentPanelState> {
 
   render() {
     const rows = () => (
-      // ts can't tell recent is never undefined here
-      // @ts-ignore
-      this.state.recent.map((song: Song, index: number) => <RecentSongView song={song} key={index} />)
+      this.state.recents.map((song: Song, index: number) => (
+        <RecentSongView song={song} key={index} />
+      ))
     )
 
-    // ts can't tell recent is never undefined here
-    // @ts-ignore
-    const loaded = this.state.recent && this.state.recent.length > 1
+    const loaded = this.state.recents && this.state.recents.length > 1
 
     return (
       <React.Fragment>

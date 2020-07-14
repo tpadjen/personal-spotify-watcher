@@ -1,38 +1,20 @@
 import * as path from 'path'
 import * as dotenv from 'dotenv'
+
 const envPath = path.join(__dirname, `../.env.${process.env.NODE_ENV || 'production'}`)
 dotenv.config({ path: envPath })
 const PRODUCTION = process.env.NODE_ENV === 'production'
-
-import * as express from 'express'
-import * as WebSocket from 'ws'
-import { Song, getSong } from './current-song'
-import * as fs from 'fs'
-
-
-const noop = () => {}
-
-
 const PORT = parseInt(process.env.PORT || (PRODUCTION ? '8080' : '8999'))
-const SOURCE_DIR = path.join(__dirname, PRODUCTION ? 'client' : '../../dist/client')
+const SOURCE_DIR = path.join(__dirname, PRODUCTION ? 'client' : '../../client')
 const RECENTS_FILE = path.join(__dirname, '../data/recents.json')
 const RECENTS_LIMIT = 100
 
-const loadRecents = (): Array<Song> => {
-  let recents: Array<Song> = []
-  if (!fs.existsSync(RECENTS_FILE)) {
-    fs.closeSync(fs.openSync(RECENTS_FILE, 'w'))
-  } else {
-    try {
-      recents = JSON.parse(fs.readFileSync(RECENTS_FILE, "utf-8"))
-    } catch (e) {}
-  }
+import { Song, getSong, loadRecents, saveRecents } from './music'
 
-  return recents
-}
+let recently_played: Array<Song> = loadRecents(RECENTS_FILE)
 
-let recently_played: Array<Song> = loadRecents()
-
+import * as express from 'express'
+import * as WebSocket from 'ws'
 const server = express()
   .use(express.static(SOURCE_DIR))
   .listen(PORT, () => console.log(`Listening on ${PORT}`))
@@ -56,7 +38,7 @@ wss.on('connection', async (ws: ExtWebSocket) => {
   // update recents, but wait for first song
   if (!song) song = await getSong()
   sendSong(song)
-  sendRecent(recently_played, song)
+  sendRecents(recently_played || [], song)
 
   ws.on('pong', () => {
     ws.isAlive = true
@@ -73,9 +55,9 @@ const sendSong = (s: Song) => {
   })
 }
 
-const sendRecent = (recent: any, newSong: Song) => {
+const sendRecents = (recents: any, newSong: Song) => {
   // remove currently playing song from recents sent to client
-  let r = JSON.parse(JSON.stringify(recent)) // make duplicate
+  let r = JSON.parse(JSON.stringify(recents)) // make duplicate
   if (r.length > 0 && newSong && r[0].item.id === newSong.item.id) {
     r.shift()
   }
@@ -83,7 +65,7 @@ const sendRecent = (recent: any, newSong: Song) => {
   wss.clients.forEach((ws: WebSocket) => {
     ws.send(JSON.stringify({
       type: 'recently_played',
-      recent: r
+      recents: r
     }))
   })
 }
@@ -117,9 +99,7 @@ const updateRecentlyPlayed = (newSong: Song) => {
         recently_played.pop()
       }
 
-      fs.writeFile(RECENTS_FILE, JSON.stringify(recently_played), "utf8", () => {
-        // console.log("Recents saved");
-      })
+      saveRecents(RECENTS_FILE, recently_played)
     }
   }
 }
@@ -133,7 +113,7 @@ setInterval(async() => {
       sendSong(newSong)
 
       if (differentSong(newSong, song)) {
-        sendRecent(recently_played, newSong)
+        sendRecents(recently_played, newSong)
       }
 
       song = newSong
@@ -149,6 +129,6 @@ const pingInterval = setInterval(() => {
     if (!ws.isAlive) return ws.terminate();
 
     ws.isAlive = false
-    ws.ping(noop)
+    ws.ping(() => {})
   })
 }, 10000);

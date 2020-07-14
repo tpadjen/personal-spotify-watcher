@@ -1,5 +1,3 @@
-
-
 export interface Album {
   "album_type": string,
   "artists": [],
