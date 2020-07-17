@@ -1,4 +1,4 @@
-# Live Spotify Song Socket
+# Personal Spotify Watcher
 
 A typescript express websocket service for providing real time tracking of my currently playing spotify song, and a list of the 100 most recently played.
 
@@ -24,7 +24,7 @@ to walk through the steps automatically.
 
 This will open a browser window and require you to sign in to spotify.
 Then grant access for your app to have access to your recently played info.
-Once you have approved, the refresh token you need will be printed to the terminal.
+Once you have approved your app, the refresh token you need will be printed to the terminal.
 Copy it into your `.env.production` and `.env.development` files.
 
 ## Run
@@ -48,7 +48,7 @@ Copy it into your `.env.production` and `.env.development` files.
 
 ## View
 
-Play a song in any spotify app.
+Play a song in any spotify app with your connected account.
 
 ### Websocket
 

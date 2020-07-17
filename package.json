@@ -1,5 +1,5 @@
 {
-  "name": "live-spotify-song-socket",
+  "name": "personal-spotify-watcher",
   "version": "1.0.0",
   "description": "",
   "main": "dist/index.js",
