@@ -8,7 +8,7 @@ Also includes a React front end as an example of how to consume the websocket us
 
 ```
 $ npm i
-$ npm run postinstall
+$ npm run create-env
 ```
 
 Sign up for a Spotify developer account and create a new app.

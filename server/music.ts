@@ -117,6 +117,7 @@ export const getRecentlyPlayed = async (): Promise<any> => {
 
 export const loadRecents = (recents_file: string): Array<Song> => {
   let recents: Array<Song> = []
+
   if (!fs.existsSync(recents_file)) {
     fs.closeSync(fs.openSync(recents_file, 'w'))
   } else {

@@ -1,10 +1,14 @@
 import * as path from 'path'
+import * as fs from 'fs'
 import * as WebSocket from 'ws'
 import { Song, getSong, loadRecents, saveRecents } from './music'
 import { Server } from 'http'
-import { add } from 'lodash'
 
 
+const DATA_FOLDER = path.join(__dirname, '../data')
+if (!fs.existsSync(DATA_FOLDER)) {
+  fs.mkdirSync(DATA_FOLDER);
+}
 const RECENTS_FILE = path.join(__dirname, '../data/recents.json')
 const RECENTS_LIMIT = 100
 const SONG_SHOULD_COUNT_TIME = 15 * 1000 // 15 seconds before countint song as a recent

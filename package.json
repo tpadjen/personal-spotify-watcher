@@ -4,7 +4,7 @@
   "description": "",
   "main": "dist/index.js",
   "scripts": {
-    "postinstall": "mkdir data && cp env.template env.development && cp env.template env.production",
+    "create-env": "cp env.template env.development && cp env.template env.production",
     "build:client:dev": "webpack --mode=development",
     "build:client:prod": "NODE_ENV=production webpack --mode=production",
     "start:client:dev": "webpack-dev-server -d --content-base ./client",
