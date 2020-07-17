@@ -1,4 +1,12 @@
 import styled from 'styled-components'
+import {
+  StyledTabContent,
+  StyledTab,
+  StyledTabNav,
+  StyledTabNavList,
+  StyledTabPanel,
+  TabColors,
+} from './utility/TabPanel'
 
 
 export const Colors = {
@@ -111,3 +119,77 @@ export const JSONThemes = {
     scrollbarThumb: Colors.alternate
   }),
 }
+
+
+export const ThemedTabColors: TabColors = {
+  bg: Colors.bg,
+  text: Colors.text,
+  highlight: Colors.highlight,
+  unselected: Colors.unselected,
+  lighter: Colors.lighter,
+}
+
+export const ThemedTab = styled(StyledTab)`
+  font-family: ${Fonts.sans};
+`
+
+export const ThemedTabPanel = styled(StyledTabPanel)`
+  margin-top: 80px;
+`
+
+export const ThemedTabNav = styled(StyledTabNav)`
+  width: 70vw;
+
+  @media screen and (max-width: 1200px) {
+    width: 80vw;
+  }
+
+  @media screen and (max-width: 900px) {
+    width: 100vw;
+  }
+`
+
+export const ThemedTabNavList = styled(StyledTabNavList)`
+  width: 70vw;
+
+  @media screen and (max-width: 1200px) {
+    width: 80vw;
+  }
+
+  @media screen and (max-width: 900px) {
+    width: 100vw;
+  }
+`
+
+export const ThemedTabContent = styled(StyledTabContent)`
+  width: 70vw;
+  overflow: auto;
+
+  @media screen and (max-width: 1200px) {
+    width: 80vw;
+
+    #recent {
+      width: 80vw;
+    }
+  }
+
+  @media screen and (max-width: 900px) {
+    width: 100vw;
+
+    #recent {
+      width: calc(100vw - 60px);
+      padding-left: 12px;
+      padding-right: 24px;
+    }
+  }
+
+  @media screen and (max-width: 400px) {
+    width: 100vw;
+
+    #recent {
+      width: calc(100vw - 20px);
+      padding-left: 12px;
+      padding-right: 24px;
+    }
+  }
+`

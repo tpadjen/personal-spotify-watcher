@@ -1,8 +1,7 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
-import { Colors, Fonts } from '../theme'
-
 const noop = () => { }
+
 
 interface TabProps {
   name: string,
@@ -10,20 +9,33 @@ interface TabProps {
   disabled: boolean,
   onClick: (event: React.MouseEvent<HTMLLIElement, MouseEvent>) => void,
   deselect: () => void,
+  TabComponent: React.ComponentType<any> | React.ElementType<any>,
+  colors: TabColors,
 }
 
-const Tab = ({ name, onClick, selected, disabled = false, deselect }: TabProps) => {
+const Tab = ({
+  name,
+  onClick,
+  selected,
+  disabled = false,
+  deselect,
+  TabComponent = StyledTab,
+  colors,
+}: TabProps) => {
 
   useEffect(() => {
     if (disabled && selected) deselect()
   }, [disabled, selected])
 
   return (
-    <Li
+    <TabComponent
       selected={selected}
       disabled={disabled}
-      onClick={(e) => disabled ? noop : onClick(e)}
-    >{name}</Li>
+      onClick={(e: React.MouseEvent<HTMLLIElement, MouseEvent>) => disabled ? noop : onClick(e)}
+      colors={colors}
+    >
+      {name}
+    </TabComponent>
   )
 }
 
@@ -32,87 +44,91 @@ interface TabContentProps {
   disabled?: boolean
 }
 
+export interface TabColors {
+  highlight: string,
+  unselected: string,
+  bg: string,
+  text: string,
+  lighter: string,
+}
+
+const DefaultColors: TabColors = {
+  highlight: 'red',
+  unselected: 'gray',
+  bg: 'white',
+  text: 'black',
+  lighter: 'aaaaaa',
+}
+
 interface TabPanelProps {
-  children?: React.ReactElement<TabContentProps> | React.ReactElement<TabContentProps>[]
+  children?: React.ReactElement<TabContentProps> | React.ReactElement<TabContentProps>[],
+  Nav?: React.ComponentType<any> | React.ElementType<any>,
+  NavList?: React.ComponentType<any> | React.ElementType<any>,
+  Content?: React.ComponentType<any> | React.ElementType<any>,
+  Panel?: React.ComponentType<any> | React.ElementType<any>,
+  Tab?: React.ComponentType<any> | React.ElementType<any>,
+  colors?: TabColors,
 }
 
-export class TabPanel extends React.Component<TabPanelProps, any> {
+export const TabPanel = ({
+  children,
+  Nav = StyledTabNav,
+  NavList = StyledTabNavList,
+  Content = StyledTabContent,
+  Panel = StyledTabPanel,
+  Tab: TabComponent,
+  colors = DefaultColors,
+}: TabPanelProps) => {
 
-  constructor(props: any) {
-    super(props)
-    this.state = {
-      selected: 0
-    }
+  const [selected, setSelected] = useState(0)
 
-    this.selectTab = this.selectTab.bind(this)
-  }
+  const deselect = (index: number) => setSelected(0)
 
-  selectTab = (index: number) => {
-    this.setState({
-      selected: index
-    })
-  }
+  const childrenEls = (React.Children.toArray(children) as React.ReactElement<TabContentProps>[])
 
-  deselect = (index: number) => {
-    this.setState({
-      selected: 0
-    })
-  }
-
-  render() {
-    const children = (React.Children.toArray(this.props.children) as React.ReactElement<TabContentProps>[])
-
-    return (
-      <StyledTabPanel>
-        <Nav>
-          <ul>
-            {
-              this.props.children && children.map((child, index) => (
-                <Tab
-                  key={index}
-                  name={child.props?.disabled ? '' : child.props.tab}
-                  selected={index === this.state.selected}
-                  onClick={() => this.selectTab(index)}
-                  disabled={child.props?.disabled}
-                  deselect={() => this.deselect(index)}
-                />
-              ))
-            }
-          </ul>
-        </Nav>
-        <TabContent>
-          {this.props.children && children[this.state.selected]}
-        </TabContent>
-      </StyledTabPanel>
-    )
-  }
-
+  return (
+    <Panel>
+      <Nav>
+        <NavList>
+          {
+            childrenEls && childrenEls.map((child, index) => (
+              <Tab
+                key={index}
+                name={child.props?.disabled ? '' : child.props.tab}
+                selected={index === selected}
+                onClick={() => setSelected(index)}
+                disabled={child.props?.disabled}
+                deselect={() => deselect(index)}
+                TabComponent={TabComponent}
+                colors={colors}
+              />
+            ))
+          }
+        </NavList>
+      </Nav>
+      <Content colors={colors}>
+        {childrenEls && childrenEls[selected]}
+      </Content>
+    </Panel>
+  )
 }
 
-const liHoverBackground = (selected: boolean, disabled: boolean): string => {
-  if (disabled) return Colors.unselected
-  return selected ? Colors.highlight : Colors.lighter
-}
 
-const liHoverTextColor = (selected: boolean, disabled: boolean): string => {
-  if (disabled) return Colors.unselected
-  return selected ? Colors.bg : Colors.text
-}
 
-const Li = styled.li<{ selected: boolean, disabled: boolean }>`
+export const StyledTab = styled.li<{ selected: boolean, disabled: boolean, colors: TabColors }>`
   padding: 20px;
   font-size: 24px;
-  background-color: ${({ selected }) => selected ? Colors.highlight : Colors.unselected};
-  color: ${({ disabled }) => disabled ? Colors.unselected : Colors.bg};
+  background-color: ${({ selected, colors }) => selected ? colors.highlight : colors.unselected};
+  color: ${({ disabled, colors }) => disabled ? colors.unselected : colors.bg};
   cursor: ${({ disabled }) => disabled ? 'default' : 'pointer'};
   font-size: 22px;
-  font-family: ${Fonts.sans};
+  font-family: 'sans';
   font-size: 30px;
   padding-top: 20px;
 
   &:hover {
-    background-color: ${({ selected, disabled }) => liHoverBackground(selected, disabled)};
-    color: ${({ selected, disabled }) => liHoverTextColor(selected, disabled)}
+    background-color: ${({ selected, disabled, colors }) => disabled ? colors.unselected : (selected ? colors.highlight : colors.bg)};
+    color: ${({ selected, disabled, colors }) => disabled ? colors.unselected : (selected ? colors.bg : colors.text)};
   }
 
   &:first-child {
@@ -128,70 +144,34 @@ const Li = styled.li<{ selected: boolean, disabled: boolean }>`
   }
 `
 
-const StyledTabPanel = styled.div`
-  margin-top: 80px;
+export const StyledTabPanel = styled.div`
   display: grid;
   justify-items: center;
   grid-template-columns: 1fr;
 `
 
-const Nav = styled.nav`
+export const StyledTabNav = styled.nav`
   display: grid;
   grid-template-columns: 100%;
-
-  ul {
-    width: 70vw;
-    display: grid;
-    grid-auto-columns: 1fr;
-    grid-auto-flow: column;
-    list-style-type: none;
-    padding: 0;
-    margin: 0;
-    grid-row: 1;
-
-    @media screen and (max-width: 1200px) {
-      width: 80vw;
-    }
-
-    @media screen and (max-width: 900px) {
-      width: 100vw;
-    }
-  }
+  width: 500px;
 `
 
-const TabContent = styled.section`
+export const StyledTabNavList = styled.ul`
+  display: grid;
+  grid-auto-columns: 1fr;
+  grid-auto-flow: column;
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+  grid-row: 1;
+`
+
+export const StyledTabContent = styled.section<{ colors: TabColors }>`
   font-size: 40px;
-  background: ${Colors.bg};
+  background: ${({ colors }) => colors.bg};
   grid-row: 2;
-  width: 70vw;
   border-bottom-left-radius: 3px;
   border-bottom-right-radius: 3px;
-
-  @media screen and (max-width: 1200px) {
-    width: 80vw;
-
-    #recent {
-      width: 80vw;
-    }
-  }
-
-  @media screen and (max-width: 900px) {
-    width: 100vw;
-
-    #recent {
-      width: calc(100vw - 60px);
-      padding-left: 12px;
-      padding-right: 24px;
-    }
-  }
-
-  @media screen and (max-width: 400px) {
-    width: 100vw;
-
-    #recent {
-      width: calc(100vw - 20px);
-      padding-left: 12px;
-      padding-right: 24px;
-    }
-  }
+  width: 500px;
+  overflow: scroll;
 `
