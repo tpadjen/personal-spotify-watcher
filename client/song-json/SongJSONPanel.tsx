@@ -31,7 +31,7 @@ export class SongJSONPanel extends React.Component<any, SongJSONPanelState> {
   render() {
     return (
       <StyledJSONPanel>
-        <JSONPanel json={this.state.song} />
+        <JSONPanel json={this.state.song || {}} />
       </StyledJSONPanel>
     )
   }

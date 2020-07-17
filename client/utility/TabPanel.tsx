@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import styled from 'styled-components'
 import { Colors, Fonts } from '../theme'
 
@@ -8,10 +8,16 @@ interface TabProps {
   name: string,
   selected: boolean,
   disabled: boolean,
-  onClick: (event: React.MouseEvent<HTMLLIElement, MouseEvent>) => void
+  onClick: (event: React.MouseEvent<HTMLLIElement, MouseEvent>) => void,
+  deselect: () => void,
 }
 
-const Tab = ({ name, onClick, selected, disabled = false }: TabProps) => {
+const Tab = ({ name, onClick, selected, disabled = false, deselect }: TabProps) => {
+
+  useEffect(() => {
+    if (disabled && selected) deselect()
+  }, [disabled, selected])
+
   return (
     <Li
       selected={selected}
@@ -47,6 +53,12 @@ export class TabPanel extends React.Component<TabPanelProps, any> {
     })
   }
 
+  deselect = (index: number) => {
+    this.setState({
+      selected: 0
+    })
+  }
+
   render() {
     const children = (React.Children.toArray(this.props.children) as React.ReactElement<TabContentProps>[])
 
@@ -62,6 +74,7 @@ export class TabPanel extends React.Component<TabPanelProps, any> {
                   selected={index === this.state.selected}
                   onClick={() => this.selectTab(index)}
                   disabled={child.props?.disabled}
+                  deselect={() => this.deselect(index)}
                 />
               ))
             }
