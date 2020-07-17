@@ -7,7 +7,7 @@ Also includes a React front end as an example of how to consume the websocket us
 ## Setup
 
 ```
-$ npm init
+$ npm i
 $ npm run postinstall
 ```
 
