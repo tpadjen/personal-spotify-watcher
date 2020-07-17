@@ -40,7 +40,6 @@ export class RecentPanel extends React.Component<any, RecentPanelState> {
             </div>
           ) : (
               <div id="recent-panel">
-                {/* <h3 id="recent-heading">Recently Played</h3> */}
                 <div id="recent">{rows()}</div>
               </div>
             )
