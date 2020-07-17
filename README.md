@@ -1,6 +1,6 @@
-# Live Spotify Song Display
+# Live Spotify Song Socket
 
-An Typescript express websocket service for providing live tracking of my 100 most recently played spotify songs.
+A typescript express websocket service for providing real time tracking of my currently playing spotify song, and a list of the 100 most recently played.
 
 Also includes a React front end as an example of how to consume the websocket using observables.
 
