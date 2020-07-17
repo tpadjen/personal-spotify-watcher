@@ -6,7 +6,8 @@ const { connection$, song$, recents$ } = SpotifyStore
 class SpotifyConnection {
 
   connect() {
-    let socket = new WebSocket(`ws://${window.location.hostname}:${process.env.PORT}`)
+    const host = `ws://${window.location.hostname}${process.env.NODE_ENV === 'production' ? '' : `: ${process.env.PORT}`}`
+    let socket = new WebSocket(host)
 
     socket.addEventListener('open', () => {
       console.log('Connected to socket')
@@ -79,4 +80,4 @@ class SpotifyConnection {
 }
 
 const connection = new SpotifyConnection()
-export { connection as SpotifyConnection}
+export { connection as SpotifyConnection }
