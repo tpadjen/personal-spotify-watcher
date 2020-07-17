@@ -2,28 +2,32 @@ import React from 'react'
 import styled from 'styled-components'
 import { Colors, Fonts } from '../theme'
 
+const noop = () => { }
 
 interface TabProps {
   name: string,
   selected: boolean,
+  disabled: boolean,
   onClick: (event: React.MouseEvent<HTMLLIElement, MouseEvent>) => void
 }
 
-const Tab = ({ name, onClick, selected }: TabProps) => {
+const Tab = ({ name, onClick, selected, disabled = false }: TabProps) => {
   return (
     <Li
       selected={selected}
-      onClick={onClick}
+      disabled={disabled}
+      onClick={(e) => disabled ? noop : onClick(e)}
     >{name}</Li>
   )
 }
 
 interface TabContentProps {
   tab: string
+  disabled?: boolean
 }
 
 interface TabPanelProps {
-  children?: React.ReactElement<TabContentProps> | React.ReactElement<TabContentProps>[];
+  children?: React.ReactElement<TabContentProps> | React.ReactElement<TabContentProps>[]
 }
 
 export class TabPanel extends React.Component<TabPanelProps, any> {
@@ -54,9 +58,10 @@ export class TabPanel extends React.Component<TabPanelProps, any> {
               this.props.children && children.map((child, index) => (
                 <Tab
                   key={index}
-                  name={child.props.tab}
+                  name={child.props?.disabled ? '' : child.props.tab}
                   selected={index === this.state.selected}
                   onClick={() => this.selectTab(index)}
+                  disabled={child.props?.disabled}
                 />
               ))
             }
@@ -71,20 +76,30 @@ export class TabPanel extends React.Component<TabPanelProps, any> {
 
 }
 
-const Li = styled.li<{ selected: boolean }>`
+const liHoverBackground = (selected: boolean, disabled: boolean): string => {
+  if (disabled) return Colors.unselected
+  return selected ? Colors.highlight : Colors.lighter
+}
+
+const liHoverTextColor = (selected: boolean, disabled: boolean): string => {
+  if (disabled) return Colors.unselected
+  return selected ? Colors.bg : Colors.text
+}
+
+const Li = styled.li<{ selected: boolean, disabled: boolean }>`
   padding: 20px;
   font-size: 24px;
   background-color: ${({ selected }) => selected ? Colors.highlight : Colors.unselected};
-  color: ${Colors.bg};
-  cursor: pointer;
+  color: ${({ disabled }) => disabled ? Colors.unselected : Colors.bg};
+  cursor: ${({ disabled }) => disabled ? 'default' : 'pointer'};
   font-size: 22px;
   font-family: ${Fonts.sans};
   font-size: 30px;
   padding-top: 20px;
 
   &:hover {
-    background-color: ${({ selected }) => selected ? Colors.highlight : Colors.lighter};
-    color: ${({ selected }) => selected ? Colors.bg : Colors.text}
+    background-color: ${({ selected, disabled }) => liHoverBackground(selected, disabled)};
+    color: ${({ selected, disabled }) => liHoverTextColor(selected, disabled)}
   }
 
   &:first-child {
