@@ -30,15 +30,15 @@ export interface ConnectionReport {
   message: string,
 }
 
-export interface SentData {
+export interface ReceivedData {
   type: string,
-  error?: string
+  data: any,
 }
 
-export interface SentSong extends SentData {
-  song: Song
+export interface ReceivedSong extends ReceivedData {
+  data: Song
 }
 
-export interface SentRecents extends SentData {
-  recents: Song[]
+export interface ReceivedRecents extends ReceivedData {
+  data: Song[]
 }

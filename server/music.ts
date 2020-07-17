@@ -102,6 +102,7 @@ export const getSong = async (): Promise<Song> => {
 
   const newSong = await getCurrentSong()
   if (current != newSong) {
+    // console.log(newSong.name)
     current = newSong
     return current
   }

@@ -1,4 +1,4 @@
-import { ConnectionStatus, SentData, SentSong, SentRecents } from './Connection.model'
+import { ConnectionStatus, ReceivedData, ReceivedSong, ReceivedRecents } from './Connection.model'
 import { SpotifyStore } from '../store/SpotifyStore'
 const { connection$, song$, recents$ } = SpotifyStore
 
@@ -13,12 +13,25 @@ class SpotifyConnection {
 
     let socket = new WebSocket(HOST)
 
+    const addChannel = (channel: string) => {
+      socket.send(JSON.stringify({
+        type: 'addChannel',
+        data: {
+          channel: channel
+        }
+      }))
+    }
+
     socket.addEventListener('open', () => {
       console.log('Connected to socket')
       connection$.next({
         status: ConnectionStatus.connected,
         message: 'Connected'
       })
+
+      addChannel('current-song')
+      addChannel('recently-played')
+      addChannel('error')
     })
 
     socket.addEventListener('close', () => {
@@ -69,14 +82,24 @@ class SpotifyConnection {
 
   }
 
-  handleMessage(data: SentData) {
-    switch (data['type']) {
-      case 'track':
-        song$.next((data as SentSong).song)
+  handleMessage(received: ReceivedData) {
+    switch (received.type) {
+      case 'current-song':
+        song$.next((received as ReceivedSong).data)
         break;
-      case 'recently_played':
-        recents$.next((data as SentRecents).recents)
+      case 'recently-played':
+        recents$.next((received as ReceivedRecents).data)
+        break;
+      case 'error':
+        console.error('Websocket error: ', received)
+        break;
+      case 'channel-added':
+        console.log(`Subscribed to ${received.data.request.data.channel} channel`)
+        break;
+      case 'message-error':
+        console.log('Error processing message: ', received.data)
       default:
+        console.log('Websocket message: ', received)
         break;
     }
   }

@@ -1,7 +1,7 @@
 import { BehaviorSubject, Observable, of } from "rxjs"
 import { Song } from "./Music.model"
 import { ConnectionReport, ConnectionStatus } from "../connection/Connection.model"
-import { map, takeWhile, take, switchMap, tap } from "rxjs/operators"
+import { map, takeWhile, take, switchMap, tap, filter, skip } from "rxjs/operators"
 
 
 class SpotifyStore {
@@ -32,8 +32,9 @@ class SpotifyStore {
   )
 
   fetched$: Observable<boolean> = this.song$.pipe(
+    skip(1), // skip initial undefined, wait for first server response
     map(() => true),
-    take(1)
+    take(2),
   )
 
   filteredSong: Function
@@ -59,7 +60,6 @@ class SpotifyStore {
 
   constructor() {
     this.filteredSong = this._filteredSong.bind(this)
-
   }
 }
 

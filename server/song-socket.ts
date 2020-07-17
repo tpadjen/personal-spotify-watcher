@@ -2,16 +2,19 @@ import * as path from 'path'
 import * as WebSocket from 'ws'
 import { Song, getSong, loadRecents, saveRecents } from './music'
 import { Server } from 'http'
+import { add } from 'lodash'
 
 
 const RECENTS_FILE = path.join(__dirname, '../data/recents.json')
 const RECENTS_LIMIT = 100
 const SONG_SHOULD_COUNT_TIME = 15 * 1000 // 15 seconds before countint song as a recent
+const CHANNELS = ['current-song', 'recently-played', 'error']
 
 let recently_played: Array<Song> = loadRecents(RECENTS_FILE)
 
 interface ExtWebSocket extends WebSocket {
-  isAlive: boolean
+  isAlive: boolean,
+  channels: Set<string>
 }
 
 const startSongSocket = (server: Server) => {
@@ -23,46 +26,131 @@ const startSongSocket = (server: Server) => {
   wss.on('connection', async (ws: ExtWebSocket) => {
 
     ws.isAlive = true
-
-    // update recents, but wait for first song
-    if (!song) song = await getSong()
-    sendSong(song)
-    sendRecents(recently_played || [], song)
+    ws.channels = new Set()
 
     ws.on('pong', () => {
       ws.isAlive = true
     })
 
+    ws.on('message', (data: string) => {
+      try {
+        const message = JSON.parse(data)
+        const response = processIncomingMessage(message, ws)
+        ws.send(JSON.stringify(response))
+      } catch (error) {
+        ws.send(JSON.stringify({
+          type: 'message-error',
+          data: error
+        }))
+      }
+    })
   })
 
-  const sendMessageToAll = (message: {}) => {
-    const json = JSON.stringify(message)
-    wss.clients.forEach((ws: WebSocket) => ws.send(json))
+  interface IncomingMessage {
+    id: string,
+    type: string,
+    data: {
+      channel?: string
+    }
   }
 
-  const sendSong = (s: Song) => {
-    sendMessageToAll({
-      type: 'track',
-      song: s
-    })
+  interface ResponseMessage {
+    type: string,
+    data: {
+      request: IncomingMessage
+    }
   }
 
-  const sendRecents = (recents: any, newSong: Song) => {
-    // remove currently playing song from recents sent to client
-    let r = JSON.parse(JSON.stringify(recents)) // make duplicate
-    if (r.length > 0 && newSong && r[0].item.id === newSong.item.id) {
-      r.shift()
+  const processIncomingMessage = (message: IncomingMessage, ws: ExtWebSocket): ResponseMessage => {
+    switch (message.type) {
+      case 'addChannel': return addChannel(message, ws)
+      default:
+        return {
+          type: 'not-supported',
+          data: {
+            request: message,
+          }
+        }
+    }
+  }
+
+  const addChannel = (message: IncomingMessage, ws: ExtWebSocket): ResponseMessage => {
+    if (!CHANNELS.includes(message.data.channel)) {
+      return {
+        type: 'channel-does-not-exist',
+        data: {
+          request: message
+        }
+      }
     }
 
-    sendMessageToAll({
-      type: 'recently_played',
-      recents: r
-    })
+    ws.channels.add(message.data.channel)
+    sendSocketMostRecentDataForChannel(message.data.channel, ws)
+
+    return {
+      type: 'channel-added',
+      data: {
+        request: message,
+      }
+    }
+  }
+
+  const sendSocketMostRecentDataForChannel = (channel: string, ws: WebSocket) => {
+    switch (channel) {
+      case 'current-song':
+        getSong().then((song) => sendSong(song, ws))
+        break;
+      case 'recently-played':
+        sendRecents(recently_played || [], song, ws)
+        break;
+      default:
+        break;
+    }
+  }
+
+  interface OutgoingMessage {
+    type: string,
+    data: any
+  }
+
+  const sendMessageToSocket = (message: OutgoingMessage, ws: WebSocket) => {
+    ws.send(JSON.stringify(message))
+  }
+
+  const sendMessageToChannel = (message: OutgoingMessage) => {
+    const json = JSON.stringify(message)
+    Array.from(wss.clients as Set<ExtWebSocket>).filter(client => client.channels.has(message.type))
+      .forEach((ws: WebSocket) => ws.send(json))
+  }
+
+  const sendSong = (s: Song, ws: WebSocket = undefined) => {
+    const message = {
+      type: 'current-song',
+      data: s
+    }
+
+    ws ? sendMessageToSocket(message, ws) : sendMessageToChannel(message)
+  }
+
+  const sendRecents = (recents: any, newSong: Song, ws: WebSocket = undefined) => {
+    // remove currently playing song from recents sent to client
+    let recentSongs = JSON.parse(JSON.stringify(recents)) // make duplicate
+    if (recentSongs.length > 0 && newSong && recentSongs[0].item.id === newSong.item.id) {
+      recentSongs.shift()
+    }
+
+    const message = {
+      type: 'recently-played',
+      data: recentSongs
+    }
+
+    ws ? sendMessageToSocket(message, ws) : sendMessageToChannel(message)
   }
 
   const sendError = (error: any) => {
-    sendMessageToAll({
-      error: error
+    sendMessageToChannel({
+      type: 'error',
+      data: error
     })
   }
 
