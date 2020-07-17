@@ -44,9 +44,9 @@ class SpotifyStore {
 
         return of(song).pipe(
           map((song: any) => JSON.parse(JSON.stringify(song))),
-          map((song: any) => ({...song, ...song.item})),
+          map((song: any) => ({ ...song, ...song.item })),
           tap((song: any) => delete song['item']),
-          map((song: any) => ({...song, href: song['external_urls'].spotify})),
+          map((song: any) => ({ ...song, href: song['external_urls'].spotify })),
           tap((song: any) => delete song['external_urls']),
           map((song: any) => {
             keys.forEach(key => delete song[key])
@@ -64,10 +64,10 @@ class SpotifyStore {
 }
 
 const spotifyStore = new SpotifyStore()
-export {spotifyStore as SpotifyStore}
+export { spotifyStore as SpotifyStore }
 export const connection$ = spotifyStore.connection$
-export const loading$    = spotifyStore.loading$
-export const okay$       = spotifyStore.okay$
-export const song$       = spotifyStore.song$
-export const recents$     = spotifyStore.recents$
-export const fetched$    = spotifyStore.fetched$
+export const loading$ = spotifyStore.loading$
+export const okay$ = spotifyStore.okay$
+export const song$ = spotifyStore.song$
+export const recents$ = spotifyStore.recents$
+export const fetched$ = spotifyStore.fetched$

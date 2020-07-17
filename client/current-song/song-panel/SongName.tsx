@@ -6,7 +6,7 @@ interface SongNameProps {
   artist: string
 }
 
-export const SongName = ({title, artist}: SongNameProps) => {
+export const SongName = ({ title, artist }: SongNameProps) => {
   return (
     <div className="info">
       <h1 id="title">{title}</h1>

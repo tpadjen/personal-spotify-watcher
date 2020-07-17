@@ -3,8 +3,10 @@ const webpack = require('webpack')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const CopyWebpackPlugin = require('copy-webpack-plugin')
 const { CleanWebpackPlugin } = require('clean-webpack-plugin')
-const createStyledComponentsTransformer  = require('typescript-plugin-styled-components').default
+const createStyledComponentsTransformer = require('typescript-plugin-styled-components').default
 const styledComponentsTransformer = createStyledComponentsTransformer();
+const envPath = path.join(__dirname, `.env.${process.env.NODE_ENV || 'development'}`)
+require('dotenv').config({ path: envPath })
 
 module.exports = {
   entry: './client/App.tsx',
@@ -49,7 +51,7 @@ module.exports = {
   plugins: [
     new CleanWebpackPlugin(),
     new webpack.DefinePlugin({
-      'process.env.PORT': process.env.NODE_ENV === 'production' ? '8080' : '8999'
+      'process.env.PORT': process.env.PORT
     }),
     new HtmlWebpackPlugin({
       template: 'client/index.html'

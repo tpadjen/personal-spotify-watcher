@@ -15,7 +15,7 @@ export class RecentPanel extends React.Component<any, RecentPanelState> {
   sub: Subscription | undefined
 
   componentDidMount() {
-    this.sub = recents$.subscribe((recents: Song[]) => this.setState({recents}))
+    this.sub = recents$.subscribe((recents: Song[]) => this.setState({ recents }))
   }
 
   componentWillUnmount() {
@@ -35,15 +35,15 @@ export class RecentPanel extends React.Component<any, RecentPanelState> {
       <React.Fragment>
         {
           !loaded ? (
-            <div style={{height: '200px', display: 'grid', alignItems: 'center'}}>
+            <div style={{ height: '200px', display: 'grid', alignItems: 'center' }}>
               <ScaleLoader height={100} width={10} color={'#189cc4'} loading={true} />
             </div>
           ) : (
-            <div id="recent-panel">
-              {/* <h3 id="recent-heading">Recently Played</h3> */}
-              <div id="recent">{rows()}</div>
-            </div>
-          )
+              <div id="recent-panel">
+                {/* <h3 id="recent-heading">Recently Played</h3> */}
+                <div id="recent">{rows()}</div>
+              </div>
+            )
         }
       </React.Fragment>
     )

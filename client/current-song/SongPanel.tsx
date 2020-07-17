@@ -19,8 +19,8 @@ export const SongPanel = () => {
           song ? (
             <SongDetails song={song} />
           ) : (
-            <NoSongPanel />
-          )
+              <NoSongPanel />
+            )
         )
       }
     </div>

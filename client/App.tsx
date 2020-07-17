@@ -15,8 +15,8 @@ const App = () => {
     <div>
       <SongPanel />
       <TabPanel>
-        <RecentPanel tab={'Recently Played'}/>
-        <SongJSONPanel tab={'Song Data'}/>
+        <RecentPanel tab={'Recently Played'} />
+        <SongJSONPanel tab={'Song Data'} />
       </TabPanel>
     </div>
   )

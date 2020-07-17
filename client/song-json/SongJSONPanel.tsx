@@ -21,7 +21,7 @@ export class SongJSONPanel extends React.Component<any, SongJSONPanelState> {
   sub: Subscription | undefined
 
   componentDidMount() {
-    this.sub = filteredSong$.subscribe((song: any) => this.setState({song}))
+    this.sub = filteredSong$.subscribe((song: any) => this.setState({ song }))
   }
 
   componentWillUnmount() {

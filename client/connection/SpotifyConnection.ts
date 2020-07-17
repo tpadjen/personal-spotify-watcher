@@ -6,8 +6,12 @@ const { connection$, song$, recents$ } = SpotifyStore
 class SpotifyConnection {
 
   connect() {
-    const host = `ws://${window.location.hostname}${process.env.NODE_ENV === 'production' ? '' : `: ${process.env.PORT}`}`
-    let socket = new WebSocket(host)
+    const PRO_PORT = window.location.hostname.match(/localhost/) ? `:${process.env.PORT}` : ''
+    const DEV_PORT = `:${process.env.PORT}`
+    const PRODUCTION = process.env.NODE_ENV === 'production';
+    const HOST = `ws://${window.location.hostname}${PRODUCTION ? PRO_PORT : DEV_PORT}`
+
+    let socket = new WebSocket(HOST)
 
     socket.addEventListener('open', () => {
       console.log('Connected to socket')

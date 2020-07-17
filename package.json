@@ -1,10 +1,10 @@
 {
-  "name": "spotify-current-song-server",
+  "name": "spotify-my-current-song",
   "version": "1.0.0",
   "description": "",
   "main": "dist/index.js",
   "scripts": {
-    "initialize": "mkdir data",
+    "postinstall": "mkdir data && cp env.template env.development && cp env.template env.production",
     "build:client:dev": "webpack --mode=development",
     "build:client:prod": "NODE_ENV=production webpack --mode=production",
     "start:client:dev": "webpack-dev-server -d --content-base ./client",
@@ -14,7 +14,8 @@
     "start:server:dev": "tsc-watch --onSuccess \"node server/index.js\"",
     "dev": "run-p start:server:dev start:client:dev",
     "start": "NODE_ENV=production node dist/index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "refresh-token": "node scripts/authorize-spotify-app.js"
   },
   "author": "Tim Padjen",
   "license": "ISC",
@@ -52,11 +53,10 @@
     "node": "14.x"
   },
   "devDependencies": {
-    "ts-node": "^8.10.2",
-    "tsc-watch": "^4.2.9",
     "@types/lodash": "^4.14.157",
     "@types/styled-components": "^5.1.1",
     "clean-webpack-plugin": "^3.0.0",
+    "cookie-parser": "^1.4.5",
     "copy-webpack-plugin": "^6.0.3",
     "css-loader": "^3.6.0",
     "html-loader": "^1.1.0",
@@ -64,6 +64,8 @@
     "node-sass": "^4.14.1",
     "sass-loader": "^9.0.2",
     "style-loader": "^1.2.1",
+    "ts-node": "^8.10.2",
+    "tsc-watch": "^4.2.9",
     "typescript-plugin-styled-components": "^1.4.4"
   }
 }

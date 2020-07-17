@@ -17,7 +17,7 @@ export interface Song {
   "progress_ms": number
 }
 
-const refreshAuthToken = async() => {
+const refreshAuthToken = async () => {
   return new Promise(async (resolve, reject) => {
     try {
       if (!spotifyApi.getAccessToken()) {
@@ -56,7 +56,7 @@ const findArtist = (artists: Array<any>): string => {
   // find the actual composer for the Philharmonic album
   const spot = artists.findIndex(artist => artist.name.match(/Royal Philharmonic/))
   if (spot > 0) {
-    return artists[spot-1].name.trim()
+    return artists[spot - 1].name.trim()
   }
 
   return artists.map((artist: any) => artist.name).join(' ')

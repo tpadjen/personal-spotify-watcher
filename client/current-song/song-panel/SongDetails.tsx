@@ -11,7 +11,7 @@ interface SongDetailsProps {
 export const SongDetails = ({ song }: SongDetailsProps) => {
   return (
     <a id="song" className="song" target="_blank" href={song.item['external_urls'].spotify}>
-      <AlbumView album={song.item.album}/>
+      <AlbumView album={song.item.album} />
       <SongName title={song.name} artist={song.artist} />
     </a>
   )
