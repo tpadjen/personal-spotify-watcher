@@ -16,3 +16,6 @@ server/**/*.js.map
 # misc
 .DS_Store
 npm-debug.log
+
+# editor
+.vscode/
