@@ -3,18 +3,15 @@ import * as fs from 'fs'
 import * as WebSocket from 'ws'
 import { Song, getSong, loadRecents, saveRecents } from './music'
 import { Server } from 'http'
+import config from './config'
 
 
 const DATA_FOLDER = path.join(__dirname, '../data')
 if (!fs.existsSync(DATA_FOLDER)) {
   fs.mkdirSync(DATA_FOLDER)
 }
-const RECENTS_FILE = path.join(__dirname, '../data/recents.json')
-const RECENTS_LIMIT = 100
-const SONG_SHOULD_COUNT_TIME = 15 * 1000 // 15 seconds before countint song as a recent
-const CHANNELS = ['current-song', 'recently-played', 'error']
 
-const recently_played: Array<Song> = loadRecents(RECENTS_FILE)
+const recently_played: Array<Song> = loadRecents(config.RECENTS_FILE)
 
 interface ExtWebSocket extends WebSocket {
   isAlive: boolean,
@@ -79,7 +76,7 @@ const startSongSocket = (server: Server): void => {
   }
 
   const addChannel = (message: IncomingMessage, ws: ExtWebSocket): ResponseMessage => {
-    if (!CHANNELS.includes(message.data.channel)) {
+    if (!config.CHANNELS.includes(message.data.channel)) {
       return {
         type: 'channel-does-not-exist',
         data: {
@@ -170,17 +167,17 @@ const startSongSocket = (server: Server): void => {
   }
 
   const updateRecentlyPlayed = (newSong: Song) => {
-    if (newSong && newSong.progress_ms >= SONG_SHOULD_COUNT_TIME) {
+    if (newSong && newSong.progress_ms >= config.SONG_SHOULD_COUNT_TIME) {
       if (!recently_played[0] || (recently_played[0] && recently_played[0].item.id !== newSong.item.id)) {
         // console.log(`Adding ${newSong.name} to recently played`)
         recently_played.unshift(newSong)
 
         // limit size of recently played list
-        while (recently_played.length > RECENTS_LIMIT) {
+        while (recently_played.length > config.RECENTS_LIMIT) {
           recently_played.pop()
         }
 
-        saveRecents(RECENTS_FILE, recently_played)
+        saveRecents(config.RECENTS_FILE, recently_played)
       }
     }
   }

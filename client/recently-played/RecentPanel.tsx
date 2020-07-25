@@ -17,7 +17,7 @@ interface RecentPanelProps {
 }
 
 export class RecentPanel extends React.Component<RecentPanelProps, RecentPanelState> {
-  state: RecentPanelState = { recents: recents$.value }
+  state: RecentPanelState = { recents: [] }
   sub: Subscription | undefined
 
   componentDidMount(): void {

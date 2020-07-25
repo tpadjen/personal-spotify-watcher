@@ -1,5 +1,7 @@
 import * as fs from 'fs'
 import SpotifyWebApi = require('spotify-web-api-node')
+import config from './config'
+
 
 const spotifyApi = new SpotifyWebApi({
   clientId: process.env.CLIENT_ID,
@@ -84,8 +86,9 @@ const getCurrentSong = async (): Promise<Song> => {
       return parseSong(data.body)
     }
 
+    const recents = loadRecents(config.RECENTS_FILE)
+    if (recents && recents.length > 0) return recents[0]
     return null
-
   } catch (error) {
     if (error.statusCode === 401) {
       // console.log('Reauthorizing')

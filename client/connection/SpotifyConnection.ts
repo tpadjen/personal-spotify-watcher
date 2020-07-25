@@ -1,6 +1,6 @@
 import { ConnectionStatus, ReceivedData, ReceivedSong, ReceivedRecents } from './Connection.model'
 import { SpotifyStore } from '../store/SpotifyStore'
-const { connection$, song$, recents$ } = SpotifyStore
+const { connection$$, song$$, recents$$ } = SpotifyStore
 
 
 class SpotifyConnection {
@@ -26,7 +26,7 @@ class SpotifyConnection {
 
     socket.addEventListener('open', () => {
       console.log('Connected to socket')
-      connection$.next({
+      connection$$.next({
         status: ConnectionStatus.connected,
         message: 'Connected'
       })
@@ -38,7 +38,7 @@ class SpotifyConnection {
 
     socket.addEventListener('close', () => {
       console.log('Connection to socket closed, Trying to reconnect...')
-      connection$.next({
+      connection$$.next({
         status: ConnectionStatus.closed,
         message: 'Trying to reconnect...'
       })
@@ -49,7 +49,7 @@ class SpotifyConnection {
 
     socket.addEventListener('error', () => {
       // console.error(`Socket error:`, err)
-      connection$.next({
+      connection$$.next({
         status: ConnectionStatus.error,
         message: 'Error'
       })
@@ -61,12 +61,12 @@ class SpotifyConnection {
       const data = JSON.parse(message.data)
       if (data.error) {
         if (data.error.message.match(/ENOTFOUND api\.spotify\.com/)) {
-          connection$.next({
+          connection$$.next({
             status: ConnectionStatus.error,
             message: 'Spotify not available...'
           })
         } else {
-          connection$.next({
+          connection$$.next({
             status: ConnectionStatus.error,
             message: 'Server problem...'
           })
@@ -75,7 +75,7 @@ class SpotifyConnection {
         return
       }
 
-      connection$.next({
+      connection$$.next({
         status: ConnectionStatus.okay,
         message: 'Data received'
       })
@@ -88,10 +88,10 @@ class SpotifyConnection {
   handleMessage(received: ReceivedData) {
     switch (received.type) {
       case 'current-song':
-        song$.next((received as ReceivedSong).data)
+        song$$.next((received as ReceivedSong).data)
         break
       case 'recently-played':
-        recents$.next((received as ReceivedRecents).data)
+        recents$$.next((received as ReceivedRecents).data)
         break
       case 'error':
         console.error('Websocket error: ', received)
