@@ -1,7 +1,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import { SpotifyConnection } from './connection/SpotifyConnection'
-import { song$ } from './store/SpotifyStore'
+import { song$, fetched$, loading$ } from './store/SpotifyStore'
 import { SongPanel } from './current-song/SongPanel'
 import { SongJSONPanel } from './song-json/SongJSONPanel'
 import { RecentPanel } from './recently-played/RecentPanel'
@@ -16,15 +16,34 @@ import {
   ThemedTab,
   ThemedTabColors,
 } from './theme'
+import { Song } from 'store/Music.model'
+
 
 SpotifyConnection.connect()
 
 const App = () => {
-  const song = useObservableState(song$)
+  const song: Song | undefined = useObservableState(song$)
+  const fetched = !!useObservableState(fetched$)
+  const loading = !!useObservableState(loading$)
 
   return (
     <div>
-      <SongPanel />
+      <TabPanel
+        Nav={ThemedTabNav}
+        NavList={ThemedTabNavList}
+        Content={ThemedTabContent}
+        Panel={ThemedTabPanel}
+        Tab={ThemedTab}
+        colors={ThemedTabColors}
+      >
+        <SongPanel
+          song={song}
+          loading={loading}
+          fetched={fetched}
+          tab={'Currently Playing'}
+        />
+        <SongJSONPanel tab={'Song Data'} disabled={!song} />
+      </TabPanel>
       <TabPanel
         Nav={ThemedTabNav}
         NavList={ThemedTabNavList}
@@ -34,7 +53,6 @@ const App = () => {
         colors={ThemedTabColors}
       >
         <RecentPanel tab={'Recently Played'} />
-        <SongJSONPanel tab={'Song Data'} disabled={!song} />
       </TabPanel>
     </div>
   )

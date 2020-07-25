@@ -134,7 +134,7 @@ export const ThemedTab = styled(StyledTab)`
 `
 
 export const ThemedTabPanel = styled(StyledTabPanel)`
-  margin-top: 80px;
+  margin-bottom: 60px;
 `
 
 export const ThemedTabNav = styled(StyledTabNav)`

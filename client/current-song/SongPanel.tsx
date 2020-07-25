@@ -2,15 +2,20 @@ import React, { ReactElement } from 'react'
 import { SongDetails } from './song-panel/SongDetails'
 import { NoSongPanel } from './NoSongPanel'
 import { Song } from '../store/Music.model'
-import { useObservableState } from 'observable-hooks'
-import { song$, fetched$, loading$ } from '../store/SpotifyStore'
 import { SongLoadingPanel } from './SongLoadingPanel'
 
 
-export const SongPanel = (): ReactElement => {
-  const song: Song | undefined = useObservableState(song$)
-  const fetched = !!useObservableState(fetched$)
-  const loading = !!useObservableState(loading$)
+interface SongPanelProps {
+  song: Song | undefined,
+  fetched: boolean,
+  loading: boolean,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  [x: string]: any
+}
+
+export const SongPanel: React.FC<SongPanelProps> = ({
+  song, fetched, loading
+}): ReactElement => {
 
   return (
     <div id="song-panel">
