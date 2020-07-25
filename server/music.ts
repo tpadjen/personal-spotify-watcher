@@ -16,7 +16,8 @@ export interface Song {
   item: {
     id: string
   },
-  'progress_ms': number
+  'progress_ms': number,
+  'is_playing': boolean,
 }
 
 export interface Artist {
@@ -86,8 +87,12 @@ const getCurrentSong = async (): Promise<Song> => {
       return parseSong(data.body)
     }
 
+    // no song
     const recents = loadRecents(config.RECENTS_FILE)
-    if (recents && recents.length > 0) return recents[0]
+    if (recents && recents.length > 0) {
+      const last = recents[0]
+      last.is_playing = false
+    }
     return null
   } catch (error) {
     if (error.statusCode === 401) {
