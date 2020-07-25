@@ -92,6 +92,7 @@ const getCurrentSong = async (): Promise<Song> => {
     if (recents && recents.length > 0) {
       const last = recents[0]
       last.is_playing = false
+      return last
     }
     return null
   } catch (error) {
