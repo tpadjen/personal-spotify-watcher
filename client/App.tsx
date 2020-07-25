@@ -26,6 +26,10 @@ const App = () => {
   const fetched = !!useObservableState(fetched$)
   const loading = !!useObservableState(loading$)
 
+  const songTabTitle = song
+    ? (song.is_playing ? 'Currently Playing' : 'Last Played')
+    : ''
+
   return (
     <div>
       <TabPanel
@@ -40,7 +44,7 @@ const App = () => {
           song={song}
           loading={loading}
           fetched={fetched}
-          tab={'Currently Playing'}
+          tab={songTabTitle}
         />
         <SongJSONPanel tab={'Song Data'} disabled={!song} />
       </TabPanel>
