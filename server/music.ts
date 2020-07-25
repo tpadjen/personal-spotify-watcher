@@ -1,12 +1,12 @@
 import * as fs from 'fs'
-const SpotifyWebApi = require('spotify-web-api-node')
+import SpotifyWebApi = require('spotify-web-api-node')
 
-var spotifyApi = new SpotifyWebApi({
+const spotifyApi = new SpotifyWebApi({
   clientId: process.env.CLIENT_ID,
   clientSecret: process.env.CLIENT_SECRET,
   redirectUri: process.env.REDIRECT_URI,
   refreshToken: process.env.REFRESH_TOKEN
-});
+})
 
 export interface Song {
   artist: string,
@@ -14,22 +14,22 @@ export interface Song {
   item: {
     id: string
   },
-  "progress_ms": number
+  'progress_ms': number
+}
+
+export interface Artist {
+  name: string
 }
 
 const refreshAuthToken = async () => {
-  return new Promise(async (resolve, reject) => {
-    try {
-      if (!spotifyApi.getAccessToken()) {
-        const data = await spotifyApi.refreshAccessToken()
-        spotifyApi.setAccessToken(data.body['access_token'])
-      }
-    } catch (error) {
-      console.error('Could not get Spotify access token:', error)
-    } finally {
-      resolve()
+  try {
+    if (!spotifyApi.getAccessToken()) {
+      const data = await spotifyApi.refreshAccessToken()
+      spotifyApi.setAccessToken(data.body['access_token'])
     }
-  })
+  } catch (error) {
+    console.error('Could not get Spotify access token:', error)
+  }
 }
 
 const removeExtraSongInfo = (title: string): string => {
@@ -37,11 +37,11 @@ const removeExtraSongInfo = (title: string): string => {
   if (title.match((/(-\s+From.*$)$/))) return title.trim()
   if (title.match((/(-\s+Theme.*$)$/))) return title.trim()
 
-  return title.replace(/-\s+.*$/, "").trim()
+  return title.replace(/-\s+.*$/, '').trim()
 }
 
 const cleanAlbum = (album: string): string => {
-  let cleaner = album.trim();
+  let cleaner = album.trim()
 
   const remove_terms = ['Deluxe', 'Remaster', 'Re-Master', 'Edition']
   remove_terms.forEach(term => {
@@ -52,18 +52,19 @@ const cleanAlbum = (album: string): string => {
   return cleaner.trim()
 }
 
-const findArtist = (artists: Array<any>): string => {
+const findArtist = (artists: Array<Artist>): string => {
   // find the actual composer for the Philharmonic album
   const spot = artists.findIndex(artist => artist.name.match(/Royal Philharmonic/))
   if (spot > 0) {
     return artists[spot - 1].name.trim()
   }
 
-  return artists.map((artist: any) => artist.name).join(' ')
+  return artists.map(artist => artist.name).join(' ')
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const parseSong = (info: any): Song => {
-  let song = {
+  const song = {
     ...info,
     artist: findArtist(info.item.artists),
     name: removeExtraSongInfo(info.item.name)
@@ -73,7 +74,7 @@ const parseSong = (info: any): Song => {
   return song
 }
 
-let current: Song = null;
+let current: Song = null
 
 const getCurrentSong = async (): Promise<Song> => {
   try {
@@ -92,7 +93,7 @@ const getCurrentSong = async (): Promise<Song> => {
       return current
     }
 
-    throw error;
+    throw error
   }
 }
 
@@ -101,14 +102,14 @@ export const getSong = async (): Promise<Song> => {
   await refreshAuthToken()
 
   const newSong = await getCurrentSong()
-  if (current != newSong) {
+  if (current !== newSong) {
     // console.log(newSong.name)
     current = newSong
     return current
   }
 }
 
-export const getRecentlyPlayed = async (): Promise<any> => {
+export const getRecentlyPlayed = async (): Promise<Song[]> => {
   await refreshAuthToken()
 
   const recent = await spotifyApi.getMyRecentlyPlayedTracks()
@@ -122,15 +123,16 @@ export const loadRecents = (recents_file: string): Array<Song> => {
     fs.closeSync(fs.openSync(recents_file, 'w'))
   } else {
     try {
-      recents = JSON.parse(fs.readFileSync(recents_file, "utf-8"))
-    } catch (e) { }
+      recents = JSON.parse(fs.readFileSync(recents_file, 'utf-8'))
+    // eslint-disable-next-line no-empty
+    } catch (e) {}
   }
 
   return recents
 }
 
 export const saveRecents = (recents_file: string, recently_played: Array<Song>): void => {
-  fs.writeFile(recents_file, JSON.stringify(recently_played), "utf8", () => {
+  fs.writeFile(recents_file, JSON.stringify(recently_played), 'utf8', () => {
     // console.log("Recents saved");
   })
 }

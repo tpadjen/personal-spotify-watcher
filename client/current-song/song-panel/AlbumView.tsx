@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { ReactElement } from 'react'
 import { Album } from '../../store/Music.model'
 
 
@@ -6,7 +6,7 @@ interface AlbumProps {
   album: Album;
 }
 
-export const AlbumView = ({ album }: AlbumProps) => {
+export const AlbumView = ({ album }: AlbumProps): ReactElement => {
   return (
     <div id="album">
       <h2 id="album-name">{album.name}</h2>

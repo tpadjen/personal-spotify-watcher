@@ -15,7 +15,8 @@
     "dev": "run-p start:server:dev start:client:dev",
     "start": "NODE_ENV=production node dist/index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "refresh-token": "node scripts/authorize-spotify-app.js"
+    "refresh-token": "node scripts/authorize-spotify-app.js",
+    "lint": "eslint ."
   },
   "author": "Tim Padjen",
   "license": "ISC",
@@ -55,10 +56,16 @@
   "devDependencies": {
     "@types/lodash": "^4.14.157",
     "@types/styled-components": "^5.1.1",
+    "@typescript-eslint/eslint-plugin": "^3.7.0",
+    "@typescript-eslint/parser": "^3.7.0",
+    "babel-eslint": "^10.1.0",
     "clean-webpack-plugin": "^3.0.0",
     "cookie-parser": "^1.4.5",
     "copy-webpack-plugin": "^6.0.3",
     "css-loader": "^3.6.0",
+    "eslint": "^7.5.0",
+    "eslint-plugin-babel": "^5.3.1",
+    "eslint-plugin-react": "^7.20.3",
     "html-loader": "^1.1.0",
     "html-webpack-plugin": "^4.3.0",
     "node-sass": "^4.14.1",

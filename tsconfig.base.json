@@ -14,14 +14,19 @@
     "forceConsistentCasingInFileNames": true,
     "baseUrl": ".",
     "paths": {
-      "@client/*": ["client/*"],
-      "@server/*": ["server/_config/*"],
+      "@client/*": [
+        "client/*"
+      ],
+      "@server/*": [
+        "server/_config/*"
+      ]
     },
     "moduleResolution": "node",
-    "allowSyntheticDefaultImports": true,
+    "allowSyntheticDefaultImports": true
   },
   "exclude": [
     "node_modules",
-    "**/*.spec.ts"
-  ]
+    "**/*.spec.ts",
+    "types"
+  ],
 }

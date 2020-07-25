@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { ReactElement } from 'react'
 import { Song } from '../store/Music.model'
 
 
@@ -6,7 +6,7 @@ interface RecentSongViewProps {
   song: Song
 }
 
-export const RecentSongView = ({ song }: RecentSongViewProps) => {
+export const RecentSongView = ({ song }: RecentSongViewProps): ReactElement => {
   return (
     <a
       className="recent-song"

@@ -1,14 +1,16 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, ReactElement } from 'react'
 import styled from 'styled-components'
-const noop = () => { }
+// eslint-disable-next-line @typescript-eslint/no-empty-function
+const noop = () => {}
 
 
 interface TabProps {
   name: string,
   selected: boolean,
   disabled: boolean,
-  onClick: (event: React.MouseEvent<HTMLLIElement, MouseEvent>) => void,
+  onClick: (event: React.MouseEvent<HTMLElement, MouseEvent>) => void,
   deselect: () => void,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   TabComponent: React.ComponentType<any> | React.ElementType<any>,
   colors: TabColors,
 }
@@ -21,7 +23,7 @@ const Tab = ({
   deselect,
   TabComponent = StyledTab,
   colors,
-}: TabProps) => {
+}: TabProps): ReactElement => {
 
   useEffect(() => {
     if (disabled && selected) deselect()
@@ -31,7 +33,7 @@ const Tab = ({
     <TabComponent
       selected={selected}
       disabled={disabled}
-      onClick={(e: React.MouseEvent<HTMLLIElement, MouseEvent>) => disabled ? noop : onClick(e)}
+      onClick={(e: React.MouseEvent<HTMLElement, MouseEvent>) => disabled ? noop : onClick(e)}
       colors={colors}
     >
       {name}
@@ -62,10 +64,15 @@ const DefaultColors: TabColors = {
 
 interface TabPanelProps {
   children?: React.ReactElement<TabContentProps> | React.ReactElement<TabContentProps>[],
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   Nav?: React.ComponentType<any> | React.ElementType<any>,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   NavList?: React.ComponentType<any> | React.ElementType<any>,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   Content?: React.ComponentType<any> | React.ElementType<any>,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   Panel?: React.ComponentType<any> | React.ElementType<any>,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   Tab?: React.ComponentType<any> | React.ElementType<any>,
   colors?: TabColors,
 }
@@ -78,13 +85,20 @@ export const TabPanel = ({
   Panel = StyledTabPanel,
   Tab: TabComponent,
   colors = DefaultColors,
-}: TabPanelProps) => {
+}: TabPanelProps): ReactElement => {
 
   const [selected, setSelected] = useState(0)
 
-  const deselect = (index: number) => setSelected(0)
+  const deselect = () => setSelected(0)
 
   const childrenEls = (React.Children.toArray(children) as React.ReactElement<TabContentProps>[])
+  // remove tab prop from display elements
+  const displayEls = childrenEls.map(child => {
+    return {
+      ...child,
+      tab: undefined,
+    }
+  })
 
   return (
     <Panel>
@@ -98,7 +112,7 @@ export const TabPanel = ({
                 selected={index === selected}
                 onClick={() => setSelected(index)}
                 disabled={child.props?.disabled}
-                deselect={() => deselect(index)}
+                deselect={() => deselect()}
                 TabComponent={TabComponent}
                 colors={colors}
               />
@@ -107,7 +121,7 @@ export const TabPanel = ({
         </NavList>
       </Nav>
       <Content colors={colors}>
-        {childrenEls && childrenEls[selected]}
+        {displayEls && displayEls[selected]}
       </Content>
     </Panel>
   )
@@ -166,7 +180,11 @@ export const StyledTabNavList = styled.ul`
   grid-row: 1;
 `
 
-export const StyledTabContent = styled.section<{ colors: TabColors }>`
+interface StyledTabContentProps {
+  colors: TabColors,
+}
+
+export const StyledTabContent = styled.section<StyledTabContentProps>`
   font-size: 40px;
   background: ${({ colors }) => colors.bg};
   grid-row: 2;

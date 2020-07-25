@@ -4,7 +4,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin')
 const CopyWebpackPlugin = require('copy-webpack-plugin')
 const { CleanWebpackPlugin } = require('clean-webpack-plugin')
 const createStyledComponentsTransformer = require('typescript-plugin-styled-components').default
-const styledComponentsTransformer = createStyledComponentsTransformer();
+const styledComponentsTransformer = createStyledComponentsTransformer()
 const envPath = path.join(__dirname, `.env.${process.env.NODE_ENV || 'development'}`)
 require('dotenv').config({ path: envPath })
 
@@ -27,16 +27,16 @@ module.exports = {
       {
         test: /\.css$/i,
         use: [
-          "style-loader",
-          "css-loader"
+          'style-loader',
+          'css-loader'
         ]
       },
       {
         test: /\.scss$/i,
         use: [
-          "style-loader",
-          "css-loader",
-          "sass-loader"
+          'style-loader',
+          'css-loader',
+          'sass-loader'
         ]
       },
       {
@@ -71,15 +71,15 @@ module.exports = {
       cacheGroups: {
         reactVendor: {
           test: /[\\/]node_modules[\\/](react|react-dom)[\\/]/,
-          name: "react"
+          name: 'react'
         },
         utilityVendor: {
           test: /[\\/]node_modules[\\/](lodash|moment|moment-timezone)[\\/]/,
-          name: "utility"
+          name: 'utility'
         },
         vendor: {
           test: /[\\/]node_modules[\\/]cl(!lodash)(!moment)(!moment-timezone)[\\/]/,
-          name: "vendor"
+          name: 'vendor'
         },
       }
     }

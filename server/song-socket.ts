@@ -7,21 +7,21 @@ import { Server } from 'http'
 
 const DATA_FOLDER = path.join(__dirname, '../data')
 if (!fs.existsSync(DATA_FOLDER)) {
-  fs.mkdirSync(DATA_FOLDER);
+  fs.mkdirSync(DATA_FOLDER)
 }
 const RECENTS_FILE = path.join(__dirname, '../data/recents.json')
 const RECENTS_LIMIT = 100
 const SONG_SHOULD_COUNT_TIME = 15 * 1000 // 15 seconds before countint song as a recent
 const CHANNELS = ['current-song', 'recently-played', 'error']
 
-let recently_played: Array<Song> = loadRecents(RECENTS_FILE)
+const recently_played: Array<Song> = loadRecents(RECENTS_FILE)
 
 interface ExtWebSocket extends WebSocket {
   isAlive: boolean,
   channels: Set<string>
 }
 
-const startSongSocket = (server: Server) => {
+const startSongSocket = (server: Server): void => {
 
   const wss = new WebSocket.Server({ server })
 
@@ -103,17 +103,18 @@ const startSongSocket = (server: Server) => {
     switch (channel) {
       case 'current-song':
         getSong().then((song) => sendSong(song, ws))
-        break;
+        break
       case 'recently-played':
         sendRecents(recently_played || [], song, ws)
-        break;
+        break
       default:
-        break;
+        break
     }
   }
 
   interface OutgoingMessage {
     type: string,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     data: any
   }
 
@@ -136,9 +137,9 @@ const startSongSocket = (server: Server) => {
     ws ? sendMessageToSocket(message, ws) : sendMessageToChannel(message)
   }
 
-  const sendRecents = (recents: any, newSong: Song, ws: WebSocket = undefined) => {
+  const sendRecents = (recents: Song[], newSong: Song, ws: WebSocket = undefined) => {
     // remove currently playing song from recents sent to client
-    let recentSongs = JSON.parse(JSON.stringify(recents)) // make duplicate
+    const recentSongs = JSON.parse(JSON.stringify(recents)) // make duplicate
     if (recentSongs.length > 0 && newSong && recentSongs[0].item.id === newSong.item.id) {
       recentSongs.shift()
     }
@@ -151,14 +152,14 @@ const startSongSocket = (server: Server) => {
     ws ? sendMessageToSocket(message, ws) : sendMessageToChannel(message)
   }
 
-  const sendError = (error: any) => {
+  const sendError = (error: Error) => {
     sendMessageToChannel({
       type: 'error',
       data: error
     })
   }
 
-  const songChanged = (newSong: Song, oldSong: Song): boolean => {
+  const songChanged = (newSong: Song): boolean => {
     if (!newSong && !song) return false
     return JSON.stringify(newSong) !== JSON.stringify(song)
   }
@@ -188,9 +189,9 @@ const startSongSocket = (server: Server) => {
   setInterval(async () => {
     try {
       const newSong: Song = await getSong()
-      updateRecentlyPlayed(newSong);
+      updateRecentlyPlayed(newSong)
 
-      if (songChanged(newSong, song)) {
+      if (songChanged(newSong)) {
         sendSong(newSong)
 
         if (differentSong(newSong, song)) {
@@ -207,14 +208,17 @@ const startSongSocket = (server: Server) => {
 
   // check each websocket connection with a heartbeat every 10 seconds
   // and clean up unresponsive clients
+  //
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const pingInterval = setInterval(() => {
     (wss.clients as Set<ExtWebSocket>).forEach((ws: ExtWebSocket) => {
-      if (!ws.isAlive) return ws.terminate();
+      if (!ws.isAlive) return ws.terminate()
 
       ws.isAlive = false
-      ws.ping(() => { })
+      // eslint-disable-next-line @typescript-eslint/no-empty-function
+      ws.ping(() => {})
     })
-  }, 10000);
+  }, 10000)
 }
 
 export default startSongSocket

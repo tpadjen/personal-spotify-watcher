@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { ReactElement } from 'react'
 
 
 interface SongNameProps {
@@ -6,7 +6,7 @@ interface SongNameProps {
   artist: string
 }
 
-export const SongName = ({ title, artist }: SongNameProps) => {
+export const SongName = ({ title, artist }: SongNameProps): ReactElement => {
   return (
     <div className="info">
       <h1 id="title">{title}</h1>

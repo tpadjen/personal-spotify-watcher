@@ -1,0 +1,6 @@
+{
+  "extends": [
+    "./.eslintrc.js.js",
+    "./.eslintrc.ts.js"
+  ]
+}

@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { ReactElement } from 'react'
 
 
 interface ToggleWithKeyProps {
@@ -12,7 +12,7 @@ interface ToggleWithKeyState {
 
 export class ToggleWithKey extends React.Component<ToggleWithKeyProps, ToggleWithKeyState> {
 
-  constructor(props: any) {
+  constructor(props: ToggleWithKeyProps) {
     super(props)
 
     this.state = {
@@ -22,7 +22,7 @@ export class ToggleWithKey extends React.Component<ToggleWithKeyProps, ToggleWit
     this.handleKeydown = this.handleKeydown.bind(this)
   }
 
-  handleKeydown(e: KeyboardEvent) {
+  handleKeydown(e: KeyboardEvent): void {
     if (e.key === this.props.keyName) {
       this.setState(() => {
         return {
@@ -32,15 +32,15 @@ export class ToggleWithKey extends React.Component<ToggleWithKeyProps, ToggleWit
     }
   }
 
-  componentDidMount() {
+  componentDidMount(): void {
     document.addEventListener('keydown', this.handleKeydown)
   }
 
-  componentWillUnmount() {
+  componentWillUnmount(): void {
     document.removeEventListener('keydown', this.handleKeydown)
   }
 
-  render() {
+  render(): ReactElement {
     return (
       <div className={this.state.hidden ? 'hidden' : ''}>
         {this.props.children}

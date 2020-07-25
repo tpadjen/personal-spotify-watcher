@@ -1,7 +1,7 @@
-import { BehaviorSubject, Observable, of } from "rxjs"
-import { Song } from "./Music.model"
-import { ConnectionReport, ConnectionStatus } from "../connection/Connection.model"
-import { map, takeWhile, take, switchMap, tap, filter, skip } from "rxjs/operators"
+import { BehaviorSubject, Observable, of } from 'rxjs'
+import { Song, FilteredSong } from './Music.model'
+import { ConnectionReport, ConnectionStatus } from '../connection/Connection.model'
+import { map, takeWhile, take, switchMap, tap, skip } from 'rxjs/operators'
 
 
 class SpotifyStore {
@@ -37,20 +37,23 @@ class SpotifyStore {
     take(2),
   )
 
-  filteredSong: Function
-  _filteredSong(keys: Array<string>): Observable<any> {
+  filteredSong: (keys: Array<string>) => Observable<FilteredSong>
+  _filteredSong(keys: Array<string>): Observable<FilteredSong> {
     return this.song$.pipe(
       switchMap((song: Song | undefined) => {
         if (song === undefined || song === null) return of(undefined)
 
         return of(song).pipe(
-          map((song: any) => JSON.parse(JSON.stringify(song))),
-          map((song: any) => ({ ...song, ...song.item })),
-          tap((song: any) => delete song['item']),
-          map((song: any) => ({ ...song, href: song['external_urls'].spotify })),
-          tap((song: any) => delete song['external_urls']),
-          map((song: any) => {
-            keys.forEach(key => delete song[key])
+          map((song: Song) => JSON.parse(JSON.stringify(song))),
+          map((song: Song) => ({ ...song, ...song.item })),
+          tap((song: Song) => delete song['item']),
+          map((song) => ({
+            ...song,
+            href: (song as unknown as FilteredSong)['external_urls'].spotify
+          })),
+          tap((song) => delete (song as unknown as FilteredSong)['external_urls']),
+          map((song) => {
+            keys.forEach(key => delete (song as unknown as Record<string, unknown>)[key])
             return song
           })
         )

@@ -1,76 +1,98 @@
 export interface Album {
-  "album_type": string,
-  "artists": [],
-  "available_markets": [],
-  "external_urls": {
-    "spotify": string
+  'album_type': string,
+  'artists': [],
+  'available_markets': [],
+  'external_urls': {
+    'spotify': string
   },
-  "href": string,
-  "id": string,
-  "images": Array<{
+  'href': string,
+  'id': string,
+  'images': Array<{
     height: number,
     url: string,
     width: number
   }>,
-  "name": string,
-  "release_date": string,
-  "release_date_precision": string,
-  "total_tracks": number,
-  "type": string,
-  "uri": string
+  'name': string,
+  'release_date': string,
+  'release_date_precision': string,
+  'total_tracks': number,
+  'type': string,
+  'uri': string
 }
 
 export interface Device {
   id: string,
-  "is_active": boolean,
-  "is_private_session": boolean,
-  "is_restricted": boolean,
-  "name": string,
-  "type": string,
-  "volume_percent": number
+  'is_active': boolean,
+  'is_private_session': boolean,
+  'is_restricted': boolean,
+  'name': string,
+  'type': string,
+  'volume_percent': number
 }
 
 export interface Artist {
-  "external_urls": {
-    "spotify": string
+  'external_urls': {
+    'spotify': string
   },
-  "href": string,
-  "id": string,
-  "name": string,
-  "type": string,
-  "uri": string
+  'href': string,
+  'id': string,
+  'name': string,
+  'type': string,
+  'uri': string
 }
 
 export interface Song {
-  actions?: {},
+  actions?: unknown,
   artist: string,
-  context?: {},
-  "currently_playing_type": string,
+  context?: unknown,
+  'currently_playing_type': string,
   device: Device,
-  "is_playing": true,
-  "item": {
-    "album": Album,
-    "artists": Array<Artist>,
-    "available_markets": Array<string>,
-    "disc_number": number,
-    "duration_ms": number,
-    "explicit": false,
-    "external_ids": {},
-    "external_urls": {
-      "spotify": string
+  'is_playing': true,
+  'item': {
+    'album': Album,
+    'artists': Array<Artist>,
+    'available_markets': Array<string>,
+    'disc_number': number,
+    'duration_ms': number,
+    'explicit': boolean,
+    'external_ids': unknown,
+    'external_urls': {
+      'spotify': string
     },
-    "href": string,
+    'href': string,
     id: string,
-    "is_local": false,
+    'is_local': false,
     name: string,
     popularity: number,
-    "track_number": number,
+    'track_number': number,
     type: string,
     uri: string
   },
   name: string,
-  "progress_ms": number,
-  "repeat_state": string,
-  "shuffle_state": false,
-  "timestamp": number
+  'progress_ms': number,
+  'repeat_state': string,
+  'shuffle_state': boolean,
+  'timestamp': number
+}
+
+export interface FilteredSong {
+  artist: string,
+  album: Album,
+  artists: Array<Artist>,
+  'available_markets'?: Array<string>,
+  'disc_number'?: number,
+  'duration_ms'?: number,
+  explicit?: boolean,
+  'external_ids'?: unknown,
+  'external_urls'?: {
+    spotify: string
+  },
+  href?: string,
+  id: string,
+  is_local?: boolean,
+  name: string,
+  popularity?: number,
+  'track_number'?: number,
+  type?: string,
+  uri?: string
 }

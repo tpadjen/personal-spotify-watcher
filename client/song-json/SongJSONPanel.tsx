@@ -1,5 +1,5 @@
-import React from 'react'
-import { Song } from '../store/Music.model'
+import React, { ReactElement } from 'react'
+import { Song, FilteredSong } from '../store/Music.model'
 import { JSONPanel } from '../utility/JSONPanel'
 import { SpotifyStore } from '../store/SpotifyStore'
 import { Subscription } from 'rxjs'
@@ -12,26 +12,32 @@ const REMOVE_KEYS = ['actions', 'context', 'device', 'progress_ms', 'shuffle_sta
   'is_local', 'preview_url', 'track_number', 'type', 'href']
 const filteredSong$ = SpotifyStore.filteredSong(REMOVE_KEYS)
 
-interface SongJSONPanelState {
-  song: Song | undefined
+interface SongJSONPanelProps {
+  // 'Indexer'
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  [x: string]: any
 }
 
-export class SongJSONPanel extends React.Component<any, SongJSONPanelState> {
+interface SongJSONPanelState {
+  song: Song | FilteredSong | undefined
+}
+
+export class SongJSONPanel extends React.Component<SongJSONPanelProps, SongJSONPanelState> {
   state: SongJSONPanelState = { song: undefined }
   sub: Subscription | undefined
 
-  componentDidMount() {
-    this.sub = filteredSong$.subscribe((song: any) => this.setState({ song }))
+  componentDidMount(): void {
+    this.sub = filteredSong$.subscribe((song: FilteredSong) => this.setState({ song }))
   }
 
-  componentWillUnmount() {
+  componentWillUnmount(): void {
     this.sub?.unsubscribe()
   }
 
-  render() {
+  render(): ReactElement {
     return (
       <StyledJSONPanel>
-        <JSONPanel json={this.state.song || {}} />
+        <JSONPanel json={(this.state.song || {}) as Record<string, unknown>} />
       </StyledJSONPanel>
     )
   }

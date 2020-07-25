@@ -1,4 +1,4 @@
-import { Song } from "store/Music.model"
+import { Song } from 'store/Music.model'
 
 
 export enum ConnectionStatus {
@@ -14,7 +14,7 @@ export interface ConnectionReport {
   message: string,
 }
 
-export const connectionStatusToString = (status: ConnectionStatus) => {
+export const connectionStatusToString = (status: ConnectionStatus): string => {
   switch (status) {
     case 0: return 'Connecting'
     case 1: return 'Connected'
@@ -32,6 +32,7 @@ export interface ConnectionReport {
 
 export interface ReceivedData {
   type: string,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   data: any,
 }
 

@@ -13,7 +13,7 @@ class SpotifyConnection {
     const PROTOCOL = PRODUCTION && !IS_LOCAL ? 'wss' : 'ws'
     const HOST = `${PROTOCOL}://${window.location.hostname}${PRODUCTION ? PRO_PORT : DEV_PORT}`
 
-    let socket = new WebSocket(HOST)
+    const socket = new WebSocket(HOST)
 
     const addChannel = (channel: string) => {
       socket.send(JSON.stringify({
@@ -42,11 +42,12 @@ class SpotifyConnection {
         status: ConnectionStatus.closed,
         message: 'Trying to reconnect...'
       })
-      const that = this;
-      setTimeout(() => that.connect(), 1000);
+      // eslint-disable-next-line @typescript-eslint/no-this-alias
+      const that = this
+      setTimeout(() => that.connect(), 1000)
     })
 
-    socket.addEventListener('error', (err) => {
+    socket.addEventListener('error', () => {
       // console.error(`Socket error:`, err)
       connection$.next({
         status: ConnectionStatus.error,
@@ -88,21 +89,22 @@ class SpotifyConnection {
     switch (received.type) {
       case 'current-song':
         song$.next((received as ReceivedSong).data)
-        break;
+        break
       case 'recently-played':
         recents$.next((received as ReceivedRecents).data)
-        break;
+        break
       case 'error':
         console.error('Websocket error: ', received)
-        break;
+        break
       case 'channel-added':
         console.log(`Subscribed to ${received.data.request.data.channel} channel`)
-        break;
+        break
       case 'message-error':
         console.log('Error processing message: ', received.data)
+        break
       default:
         console.log('Websocket message: ', received)
-        break;
+        break
     }
   }
 
