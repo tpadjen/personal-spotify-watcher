@@ -13,6 +13,7 @@ interface TabProps {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   TabComponent: React.ComponentType<any> | React.ElementType<any>,
   colors: TabColors,
+  clickable: boolean
 }
 
 const Tab = ({
@@ -23,6 +24,7 @@ const Tab = ({
   deselect,
   TabComponent = StyledTab,
   colors,
+  clickable = true,
 }: TabProps): ReactElement => {
 
   useEffect(() => {
@@ -35,6 +37,7 @@ const Tab = ({
       disabled={disabled}
       onClick={(e: React.MouseEvent<HTMLElement, MouseEvent>) => disabled ? noop : onClick(e)}
       colors={colors}
+      clickable={clickable}
     >
       {name}
     </TabComponent>
@@ -112,6 +115,7 @@ export const TabPanel = ({
                 selected={index === selected}
                 onClick={() => setSelected(index)}
                 disabled={child.props?.disabled}
+                clickable={childrenEls.length > 1}
                 deselect={() => deselect()}
                 TabComponent={TabComponent}
                 colors={colors}
@@ -129,12 +133,17 @@ export const TabPanel = ({
 
 
 
-export const StyledTab = styled.li<{ selected: boolean, disabled: boolean, colors: TabColors }>`
+export const StyledTab = styled.li<{
+  selected: boolean,
+  disabled: boolean,
+  colors: TabColors,
+  clickable: boolean,
+}>`
   padding: 20px;
   font-size: 24px;
   background-color: ${({ selected, colors }) => selected ? colors.highlight : colors.unselected};
   color: ${({ disabled, colors }) => disabled ? colors.unselected : colors.bg};
-  cursor: ${({ disabled }) => disabled ? 'default' : 'pointer'};
+  cursor: ${({ disabled, clickable }) => disabled || !clickable ? 'default' : 'pointer'};
   font-size: 22px;
   font-family: 'sans';
   font-size: 30px;
