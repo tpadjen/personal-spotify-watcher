@@ -145,7 +145,8 @@ export const ThemedTabNav = styled(StyledTabNav)`
   }
 
   @media screen and (max-width: 900px) {
-    width: 100vw;
+    width: 100%;
+    max-width: 100%;
   }
 `
 
@@ -157,7 +158,8 @@ export const ThemedTabNavList = styled(StyledTabNavList)`
   }
 
   @media screen and (max-width: 900px) {
-    width: 100vw;
+    width: 100%;
+    max-width: 100%;
   }
 `
 
@@ -174,7 +176,8 @@ export const ThemedTabContent = styled(StyledTabContent)`
   }
 
   @media screen and (max-width: 900px) {
-    width: 100vw;
+    width: 100%;
+    max-width: 100%;
 
     #recent {
       width: calc(100vw - 60px);
@@ -184,7 +187,8 @@ export const ThemedTabContent = styled(StyledTabContent)`
   }
 
   @media screen and (max-width: 400px) {
-    width: 100vw;
+    width: 100%;
+    max-width: 100%;
 
     #recent {
       width: calc(100vw - 20px);
